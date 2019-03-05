@@ -15,33 +15,30 @@ knitr::opts_chunk$set(warning=FALSE)
 # Problem 1
 
 **a)**
-    
+
+**1.**
+\newline
 * `Estimate` - in particular interpretation of `Intercept`
 \newline 
 Estimated regression coefficients given by 
 $$\hat{\boldsymbol{\beta}} = (X^TX)^{-1}X^T\mathbf{Y}$$.
-\newline When increasing covariate $x_j$ with one unit, and keeping all other covariates constant, the response variable changes with a factor of $\hat{\beta_j}$. Positive estimates reduce the value of the response, while negative estimates increase the value. Example increasing AGE from 25 to 26 will increase $\log(\text{FEV})$ by $0.023$. Similarily, for the binary predictor SMOKE, the coefficient estimate represent the change in the response when changing from non-smoker (0) to smoker (1), and is equal to $-0.046$. The intercept is the value of the response when all covariates are set to zero. This is not necessarily realistic, as there is no humans with e.g zero height.
+\newline where $X$ is the design matrix of the regression, $\mathbf{y}$ is a vector containing the observed response values and $\hat{\boldsymbol{\beta}}$ is a vector containing the estimated regression coefficients. The interpretation of the regression coefficients is that if we increase covariate $x_j$ with one unit, and keeping all other covariates constant, the response variable changes with a factor of $\hat{\beta_j}$.
 
 * `Std.Error`
 \newline 
 Estimated standard deviation of the estimated regression coefficients, i.e the average amount that the estimated regression coefficients vary from the actual value. The Std.Error is given by 
-$$\widehat{\text{SD}}(\hat{\beta_j}) =\sqrt{\hat{\sigma}^2(X^TX)^{-1}_{jj}}$$, where $X$ is the design matrix of the regression, and $\hat{\sigma}$ is the residual standard error.
+$$\widehat{\text{SD}}(\hat{\beta_j}) = \sqrt{\hat{\sigma}^2(X^TX)^{-1}_{jj}}$$, where $X$ is the design matrix of the regression, and $\hat{\sigma}$ is the residual standard error.
 
 * `t value`
+\newline
+Value of the t-statistic for testing whether the corresponding regression coefficient is different from 0. The t-value is given by 
+$$t = $$
 
 *`P(>|t|)`
 
 
-```{r cars}
-summary(cars)
-```
+**2.**
+\newline
 
-## Including Plots
 
-You can also embed plots, for example:
 
-```{r pressure, echo=FALSE}
-plot(pressure)
-```
-
-Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.

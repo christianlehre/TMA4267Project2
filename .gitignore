@@ -9,7 +9,7 @@
 *-Ex.R
 
 
-
+#ignore Rproj and pdf
 *.Rproj
 
 *.pdf

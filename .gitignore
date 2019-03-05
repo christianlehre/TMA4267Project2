@@ -8,6 +8,13 @@
 # Example code in package build process
 *-Ex.R
 
+
+
+*.Rproj
+
+*.pdf
+
+
 # Output files from R CMD build
 /*.tar.gz
 
@@ -34,3 +41,4 @@ vignettes/*.pdf
 
 # Shiny token, see https://shiny.rstudio.com/articles/shinyapps.html
 rsconnect/
+.Rproj.user

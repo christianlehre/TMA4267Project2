@@ -21,7 +21,7 @@ knitr::opts_chunk$set(warning=FALSE)
 * `Estimate` - in particular interpretation of `Intercept`
 \newline 
 Estimated regression coefficients given by 
-$$\hat{\boldsymbol{\beta}} = (X^TX)^{-1}X^T\mathbf{Y}$$.
+$$\hat{\boldsymbol{\beta}} = (X^TX)^{-1}X^T\mathbf{y}$$.
 \newline where $X$ is the design matrix of the regression, $\mathbf{y}$ is a vector containing the observed response values and $\hat{\boldsymbol{\beta}}$ is a vector containing the estimated regression coefficients. The interpretation of the regression coefficients is that if we increase covariate $x_j$ with one unit, and keeping all other covariates constant, the response variable changes with a factor of $\hat{\beta_j}$.
 
 * `Std.Error`
@@ -40,5 +40,16 @@ $$t = $$
 **2.**
 \newline
 
+**3.**
+\newline
+The estimated regression coefficient for BMI can be interpreted as the change in the response variable when the BMI increases by one. In our example it is given as 5.6, which means that if a person increase his or her BMI by 1, the estimate for the progression of the disease after one year will increase by 5.6.
+**4.**
+\newline
+**5.**
+\newline
+The covariates that are significant at level 0.05 are the ones with a p-value below this. From the printed model summary we see that the covariates sex, bmi, map and ltg are significant at level 0.05. The null hypothesis related to this p-value is that the covariates are equal to zero, while the alternative hypothesis is that they are unequal to zero,
+\begin{equation}
+     H_0: \beta_j=0, \qquad H_1: \beta \neq 0
+\end{equation}
 
 

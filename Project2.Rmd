@@ -1,6 +1,6 @@
 ---
 title: "Project2"
-author: "Christian Lehre, Erik Bøe & Axel Ronold"
+author: "Christian Lehre, Erik Bøe & Axel Rønold"
 date: "3/5/2019"
 output: pdf_document
 ---
@@ -13,15 +13,28 @@ knitr::opts_chunk$set(warning=FALSE)
 ```
 
 # Problem 1
-
+```{r,eval = TRUE}
+ds <-  read.csv("https://web.stanford.edu/~hastie/CASI_files/DATA/diabetes.csv",sep = ",")
+apply(ds,2,summary)
+pairs(ds,pch = '.')
+full <- lm(prog ~.,data = ds)
+summary(full)
+plot(full$fitted, rstudent(full), pch = 20)
+qqnorm(rstudent(full),pch = 20)
+qqline(rstudent(full),col = 2)
+library(nortest)
+ad.test(rstudent(full))
+```
 **a)**
 
 
+**1.**
+\newline
 * `Estimate` - in particular interpretation of `Intercept`
 \newline 
 Estimated regression coefficients given by 
 $$\hat{\boldsymbol{\beta}} = (X^TX)^{-1}X^T\mathbf{Y}$$.
-\newline When increasing covariate $x_j$ with one unit, and keeping all other covariates constant, the response variable changes with a factor of $\hat{\beta_j}$. Positive estimates reduce the value of the response, while negative estimates increase the value. 
+\newline where $X$ is the design matrix of the regression, $\mathbf{y}$ is a vector containing the observed response values and $\hat{\boldsymbol{\beta}}$ is a vector containing the estimated regression coefficients. The interpretation of the regression coefficients is that if we increase covariate $x_j$ with one unit, and keeping all other covariates constant, the response variable changes with a factor of $\hat{\beta_j}$.
 
 * `Std.Error`
 \newline 
@@ -31,11 +44,84 @@ $$\widehat{\text{SD}}(\hat{\beta_j}) = \sqrt{\hat{\sigma}^2(X^TX)^{-1}_{jj}}$$, 
 * `t value`
 \newline
 Value of the t-statistic for testing whether the corresponding regression coefficient is different from 0. The t-value is given by 
-$$t = \frac{\beta_j-\hat{\beta_j}}{\widehat{\text{SD}(\hat{\beta_j})}}$$, where $\beta_j$ is the regression coefficient for covariate $x_j$, $\hat{\beta_j}$ the estimated regression coefficient and $\widehat{\text{SD}(\hat{\beta_j})}$ the Std.Error as explained above
+$$t = \frac{\beta_j-\hat{\beta_j}}{\widehat{\text{SD}(\hat{\beta_j})}}$$, where $\beta_j$ is the regression coefficient for covariate $x_j$, $\hat{\beta_j}$ the estimated regression coefficient and $\widehat{\text{SD}(\hat{\beta_j})}$ the Std.Error as explained above.
 
 * `P(>|t|)`
 \newline
+Probability of observing a more extreme value than $t$ under the null hypothesis, i.e the so-called p-value used in hypothesis testing. The p-value is given by
+$$
+2P(T < |t| : H_0)
+$$
+Assuming a two-sided hypothesis test. $H_0$ is the null-hypothesis, $T$ is a random vector and $t$ is the observed value
+
+**2.**
+\newline
+The estimate for the intercept can be interpreted as the value of the response when all covariates are set to zero. This is not realistic espescially for models when some of the covariates cannot simply be zero, e.g Age and Weight or binomials with values not equal to zero. 
+
+**4.**
+\newline
+The estimated error standard deviation is found in the summary as the Residual standard error, and is interpreted as the mean deviance between the estimated and true regression line. The estimated error variance is found by squaring the Residual standard error. 
+The formula for the estimated error variance is 
+$$\hat{\sigma}^2 = \frac{RSS}{n-p} = \frac{\sum_{i = 1}^n(y_i - \hat{y_i})^2}{n-p}$$
+where n is the number of observations and p is the number of covariates in the model.
+
+**b) Model Evaluation**
+
+In terms of proportion of variance explained by the model, the fit is pretty poor. Both $R^2$ and adjusted $R^2$ yields a pretty low value of roughly 51% explained variance. 
+The Anderson-Darling normality test yields a high p-value, and thus the hypothesis that the residuals are normally distributed is accepted. 
+One observes from figure 2 that the studentized residuals are heteroscedatic, and thus the errors are heteroscedatic. This is problematic, as the linear model assumes homoscedatic errors.
+There is also no evidence of any non-linear effects of the covariates looking at the studentized residuals
+
+To look into the significance of the regression one can use the so-called F-test: 
+$$
+H_0: \beta_j = 0 \;\;\forall j = 0, \dots ,p \quad H_1: \text{at least one} \; \beta_j \ne 0
+$$
+The F-test yields a low p-value, and the null-hypothesis is rejected. Thus, the regression is significant.
+
+**c)**
+```{r,eval = TRUE}
+library(leaps)
+allsubs <- regsubsets(prog ~.,data = ds, nvmax = 10)
+allsummary <- summary(allsubs)
+allsummary$outmat
+which.max(allsummary$adjr2)
+plot(allsummary$adjr2,xlab = 'Variables',ylab = 'R2adj',type = 'l')
+plot(allsubs,scale = 'adjr2')
+which.min(allsummary$bic)
+plot(allsummary$bic,xlab = 'variables',ylab = 'BIC',type = 'l')
+plot(allsubs,scale = 'bic')
+```
+The more covariates included in a model, the more complex the model is, and the model becomes less biased. Thus, by the biad-variance tradeoff, the more complex a model is, the higher the variance of the resulting model. When doing predictions, one obtains a more accurate prediction if the variance is low. Hence, a reduced model results in lower variance, and might perform better when doing predictions. 
+
+As for the best subset model selection method, one fit for every covariate $k = 0,...,p$, all the $p\choose k$ models containing k covariates, and pick the best model (which contains an equal amount of covariates) in terms of the $R^2$-metric. Once the methods has found the best $p$ models each containing a different amount of covariates, the method choose the ultimately best model in terms of some model choice criteria, e.g BIC or $R^2_{\text{adj}}$.
+
+BIC is an abbreviation of Bayesian Information Criterion, and is defined as 
+$$
+\text{BIC} = \frac{RSS/n}{\hat{\sigma}^2} + \log{n}\frac{p}{n} = \frac{\sum_{i = 1}^n(y_i - \hat{y_i})^2/n}{\hat{\sigma}^2} + \log{n}\frac{p}{n}
+$$
+The model with the lowest BIC is the preferred model.
+
+$R^2_{\text{adj}}$ is a measure of proportion of variability explained by a model, where the number of covaraites included in the model is taken into account. $R^2_{\text{adj}}$ is defined as
+
+$$
+R^2_{\text{adj}} = 1 - \frac{RSS/(n-p)}{TSS/(n-1)} = 1  -\frac{\sum_{i = 1}^n(y_i-\hat{y_i})^2/(n-p)}{\sum_{j = 1}^n(y_i-\bar{y})^2/(n-1)}
+$$
+Note that $R^2_{\text{adj}}$ includes a penalty on the number of included covariates $p$ in the model, and that $p = 1$ corresponds the the multiple $R^2$.
+The model with highest $R^2_{\text{adj}}$ is the preferred model.
+
+The 10 different models was calculated using the regsubsets-command in R, which use the "leaps and bounds" algorithm. The algorithms return the optimal model, and thereby avoid the computation of all $2^p$ models, where $p$ is the number of covariates in the full model. 
 
 
+Based on BIC, the best reduced model contains 5 covariates, while the best reduced model based on $R^2_{\text{adj}}$ contains 8. The best model for each model selection criteria is found in the best subset selection matrix above. THe resulting model fits are shown in the code-chunk below. 
+
+Comparing these two model fits by means of $R^2_{\text{adj}}$, one observes that the best model results from the $R^2_{\text{adj}}$-model selection criteria. 
+
+ - compare chosen model with full model -
+```{r,eval = TRUE}
+bic.fit = lm(prog~sex+bmi+map+hdl+ltg,data = ds)
+summary(bic.fit)
+r2adj.fit = lm(prog~sex+bmi+map+tc+ldl+tch+ltg+glu,data = ds)
+summary(r2adj.fit)
+```
 
 

@@ -15,7 +15,7 @@ knitr::opts_chunk$set(warning=FALSE)
 # Problem 1
 
 **a)**
-
+Not testing
     
 * `Estimate` - in particular interpretation of `Intercept`
 \newline 
@@ -26,23 +26,12 @@ $$\hat{\boldsymbol{\beta}} = (X^TX)^{-1}X^T\mathbf{Y}$$.
 * `Std.Error`
 \newline 
 Estimated standard deviation of the estimated regression coefficients, i.e the average amount that the estimated regression coefficients vary from the actual value. The Std.Error is given by 
-$$\widehat{\text{SD}}(\hat{\beta_j}) =\sqrt{\hat{\sigma}^2(X^TX)^{-1}_{jj}}$$, where $X$ is the design matrix of the regression, and $\hat{\sigma}$ is the residual standard error.
+$$\widehat{\text{SD}}(\hat{\beta_j}) = \sqrt{\hat{\sigma}^2(X^TX)^{-1}_{jj}}$$, where $X$ is the design matrix of the regression, and $\hat{\sigma}$ is the residual standard error.
 
 * `t value`
-
+\newline
+Value of the t-statistic for testing whether the corresponding regression coefficient is different from 0. The t-value is given by 
+$$t = $$
 *`P(>|t|)`
 
 
-```{r cars}
-summary(cars)
-```
-
-## Including Plots
-
-You can also embed plots, for example:
-
-```{r pressure, echo=FALSE}
-plot(pressure)
-```
-
-Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.

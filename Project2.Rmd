@@ -68,7 +68,7 @@ The formula for the estimated error variance is
 $$\hat{\sigma}^2 = \frac{RSS}{n-p} = \frac{\sum_{i = 1}^n(y_i - \hat{y_i})^2}{n-p}$$
 where n is the number of observations and p is the number of covariates in the model.
 
-*5.*
+**5.**
 \newline
 The covariates that are significant at level 0.05 are the ones with a p-value below this. From the printed model summary we see that the covariates sex, bmi, map and ltg are significant at level 0.05. The null hypothesis related to this p-value is that the covariates are equal to zero, while the alternative hypothesis is that they are unequal to zero,
 \begin{equation}

@@ -27,10 +27,9 @@ full <- lm(prog ~.,data = ds)
 ```
 **a)**
 
-
 **1.**
-\newline
-* `Estimate` - in particular interpretation of `Intercept`
+
+* `Estimate`
 \newline 
 Estimated regression coefficients given by 
 $$\hat{\boldsymbol{\beta}} = (X^TX)^{-1}X^T\mathbf{y}$$.
@@ -83,6 +82,8 @@ The Anderson-Darling normality test yields a high p-value, and thus the hypothes
 However, one observes from figure 2 that the studentized residuals are heteroscedatic, and thus the errors are heteroscedatic. This is problematic, as the linear model assumes homoscedatic errors.
 There is also no evidence of any non-linear effects of the covariates looking at the studentized residuals. Or does the residuals lie a bit over the zero mean in the beginning and below in the end(??).
 
+Looking at the scatter-plot between all the covariated in figure 2, it is clear that some of the covariates are highly correlated, e.g tc and ldl. This results in imprecise estimation of the regression parameters, as the variance is high in this situation.
+
 To look into the significance of the regression one can use the F-test: 
 $$
 H_0: \beta_j = 0 \;\;\forall j = 0, \dots ,p \quad H_1: \text{at least one} \; \beta_j \ne 0
@@ -131,36 +132,40 @@ The model with highest $R^2_{\text{adj}}$ is the preferred model.
 
 The 10 different models was calculated using the regsubsets-command in R, which use the "leaps and bounds" algorithm. The algorithms return the optimal model, and thereby avoid the computation of all $2^p$ models, where $p$ is the number of covariates in the full model. 
 
-
 Based on BIC, the best reduced model contains 5 covariates, while the best reduced model based on $R^2_{\text{adj}}$ contains 8. The best model for each model selection criteria is found in the best subset selection matrix above. THe resulting model fits are shown in the code-chunk below. 
 
-Comparing these two model fits by means of $R^2_{\text{adj}}$, one observes that the best model results from the $R^2_{\text{adj}}$-model selection criteria. This will from now on be referred to as the reduced model. The fitted regression model for the reduced model is 
-
+One observes that all covariates are significant in the less complex model, i.e the model chosen by the BIC criteria. The model chosen by the $R^2_{\text{adj}}$ criterion contains unsignificant variables as well. To choose the best of these two models we also look at how BIC and $R^2_{\text{adj}}$ behaves with varying included covariates. If one look at the plot of $R^2_{\text{adj}}$ one observes that the $R^2_{\text{adj}}$ is pretty much stable in the interval 5-10 covariates. However, in the BIC-plot, one observes a low at 5 covariates followed by a clear increase up to the full model. Therefore 5 covariates is closest to optimal when considering both criterions. 
+Based on this, we chose to go forward with the model selected by the BIC criterion, i.e the model with 5 covariates. This model will from now on be referred to as the reduced model.The reduced fitted regression model is given by,
 $$
-\widehat{\text{Prog}} = -328.6 - 23.0\text{Sex} + 5.6\text{Bmi} + 1.1\text{Map} -0.8\text{Tc} + 0.5\text{Ldl} + 4.7\text{Tch} + 144.9\text{Ltg} + 0.3\text{Glu}
+\widehat{\text{Prog}} = -240.0 - 22.4\text{Sex} + 5.6\text{Bmi} + 1.1\text{Map} -1.1\text{Hdl} + 99.5\text{Ltg} 
 $$
 
 ```{r,eval = TRUE,echo = TRUE}
 bic.fit = lm(prog~sex+bmi+map+hdl+ltg,data = ds)
 summary(bic.fit)
+
 r2adj.fit = lm(prog~sex+bmi+map+tc+ldl+tch+ltg+glu,data = ds)
 summary(r2adj.fit)
 ```
-
-
 ```{r,eval = TRUE}
 model.full = summary(full)
 model.full
 ```
-
-```{r,eval = TRUE}
-model.reduced = summary(r2adj.fit)
-model.reduced
-```
-Based on the $R^2_{\text{adj}}$-metric, the reduced model performs better, i.e the reduced model explains a greater proportion of variability in the data. However, the difference is not great ($\sim 0.002$).
-
-Both models contains an equal amount of significant covariates, but the covariate tc is found to be significant at a lower level of significance. 
+As mentioned above, all included covariates in the reduced model are significant. The full model, however, contains unsignificant covariates. Including these irrelevant variables causes the precision of the estimators to decrease due to overfitting, and thus we prefer the reduced model.
 
 The overall standard error is less in the reduced model than the full, meaning that the prediction from the reduced model is more accurate.
 
-The estimated regression parameters is lower in the reduced model, i.e the contribution to the response from a unit increase of a single covariate, while all others are kept constant, are lower in the reduced model. 
+** d) **
+
+```{r,eval = TRUE}
+p_age = model.full$coefficients['age','Pr(>|t|)']
+p_tc =  model.full$coefficients['tc','Pr(>|t|)']
+p_ldl =  model.full$coefficients['ldl','Pr(>|t|)']
+p_tch =  model.full$coefficients['tch','Pr(>|t|)']
+p_glu =  model.full$coefficients['glu','Pr(>|t|)']
+p_tot = p_age*p_tc*p_ldl*p_tch*p_glu
+p_tot
+
+#model.test = lm(prog~age+tc+ldl+tch+glu,data = ds)
+#print(anova(full,model.test))
+```

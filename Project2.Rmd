@@ -13,38 +13,37 @@ knitr::opts_chunk$set(warning=FALSE)
 ```
 
 # Problem 1
-```{r,eval = TRUE}
+```{r,eval = TRUE,echo = FALSE}
 ds <-  read.csv("https://web.stanford.edu/~hastie/CASI_files/DATA/diabetes.csv",sep = ",")
-apply(ds,2,summary)
-pairs(ds,pch = '.')
+#apply(ds,2,summary)
+#pairs(ds,pch = '.')
 full <- lm(prog ~.,data = ds)
-summary(full)
-plot(full$fitted, rstudent(full), pch = 20)
-qqnorm(rstudent(full),pch = 20)
-qqline(rstudent(full),col = 2)
-library(nortest)
-ad.test(rstudent(full))
+#summary(full)
+#plot(full$fitted, rstudent(full), pch = 20)
+#qqnorm(rstudent(full),pch = 20)
+#qqline(rstudent(full),col = 2)
+#library(nortest)
+#ad.test(rstudent(full))
 ```
 **a)**
 
-
 **1.**
-\newline
-* `Estimate` - in particular interpretation of `Intercept`
+
+* `Estimate`
 \newline 
 Estimated regression coefficients given by 
-$$\hat{\boldsymbol{\beta}} = (X^TX)^{-1}X^T\mathbf{y}$$.
+$$\hat{\boldsymbol{\beta}} = (X^TX)^{-1}X^T\mathbf{y},$$
 \newline where $X$ is the design matrix of the regression, $\mathbf{y}$ is a vector containing the observed response values and $\hat{\boldsymbol{\beta}}$ is a vector containing the estimated regression coefficients. The interpretation of the regression coefficients is that if we increase covariate $x_j$ with one unit, and keeping all other covariates constant, the response variable changes with a factor of $\hat{\beta_j}$.
 
 * `Std.Error`
 \newline 
 Estimated standard deviation of the estimated regression coefficients, i.e the average amount that the estimated regression coefficients vary from the actual value. The Std.Error is given by 
-$$\widehat{\text{SD}}(\hat{\beta_j}) = \sqrt{\hat{\sigma}^2(X^TX)^{-1}_{jj}}$$, where $X$ is the design matrix of the regression, and $\hat{\sigma}$ is the residual standard error.
+$$\widehat{\text{SD}}(\hat{\beta_j}) = \sqrt{\hat{\sigma}^2(X^TX)^{-1}_{jj}},$$ where $X$ is the design matrix of the regression, and $\hat{\sigma}$ is the residual standard error.
 
 * `t value`
 \newline
 Value of the t-statistic for testing whether the corresponding regression coefficient is different from 0. The t-value is given by 
-$$t = \frac{\beta_j-\hat{\beta_j}}{\widehat{\text{SD}(\hat{\beta_j})}}$$, where $\beta_j$ is the regression coefficient for covariate $x_j$, $\hat{\beta_j}$ the estimated regression coefficient and $\widehat{\text{SD}(\hat{\beta_j})}$ the Std.Error as explained above.
+$$t = \frac{\beta_j-\hat{\beta_j}}{\widehat{\text{SD}(\hat{\beta_j})}},$$ where $\beta_j$ is the regression coefficient for covariate $x_j$, $\hat{\beta_j}$ the estimated regression coefficient and $\widehat{\text{SD}(\hat{\beta_j})}$ the Std.Error as explained above.
 
 * `P(>|t|)`
 \newline
@@ -56,11 +55,12 @@ Assuming a two-sided hypothesis test. $H_0$ is the null-hypothesis, $T$ is a ran
 
 **2.**
 \newline
-The estimate for the intercept can be interpreted as the value of the response when all covariates are set to zero. This is not realistic espescially for models when some of the covariates cannot simply be zero, e.g Age and Weight or binomials with values not equal to zero. 
+The estimate for the intercept can be interpreted as the value of the response when all covariates are set to zero. This is not realistic espescially for models when some of the covariates cannot simply be zero, e.g Age and Weight or binomials which does not have zero in its domain. 
 
 **3.**
 \newline
 The estimated regression coefficient for BMI can be interpreted as the change in the response variable when the BMI increases by one. In our example it is given as 5.6, which means that if a person increase his or her BMI by 1, the estimate for the progression of the disease after one year will increase by 5.6.
+
 **4.**
 \newline
 The estimated error standard deviation is found in the summary as the Residual standard error, and is interpreted as the mean deviance between the estimated and true regression line. The estimated error variance is found by squaring the Residual standard error. 
@@ -82,6 +82,8 @@ The Anderson-Darling normality test yields a high p-value, and thus the hypothes
 However, one observes from figure 2 that the studentized residuals are heteroscedatic, and thus the errors are heteroscedatic. This is problematic, as the linear model assumes homoscedatic errors.
 There is also no evidence of any non-linear effects of the covariates looking at the studentized residuals. Or does the residuals lie a bit over the zero mean in the beginning and below in the end(??).
 
+Looking at the scatter-plot between all the covariated in figure 2, it is clear that some of the covariates are highly correlated, e.g tc and ldl. This results in imprecise estimation of the regression parameters, as the variance is high in this situation.
+
 To look into the significance of the regression one can use the F-test: 
 $$
 H_0: \beta_j = 0 \;\;\forall j = 0, \dots ,p \quad H_1: \text{at least one} \; \beta_j \ne 0
@@ -98,7 +100,7 @@ sum of squares $\varepsilon_i^2$ are, and thus the better the fit to the data.
 In terms of proportion of variance explained by this model, the fit is pretty poor. Both $R^2$ and adjusted $R^2$ yields a pretty low value of roughly 51% explained variance.
 
 **c)**
-```{r,eval = TRUE,echo = FALSE}
+```{r,eval = FALSE,echo = FALSE}
 library(leaps)
 allsubs <- regsubsets(prog ~.,data = ds, nvmax = 10)
 allsummary <- summary(allsubs)
@@ -130,36 +132,48 @@ The model with highest $R^2_{\text{adj}}$ is the preferred model.
 
 The 10 different models was calculated using the regsubsets-command in R, which use the "leaps and bounds" algorithm. The algorithms return the optimal model, and thereby avoid the computation of all $2^p$ models, where $p$ is the number of covariates in the full model. 
 
-
 Based on BIC, the best reduced model contains 5 covariates, while the best reduced model based on $R^2_{\text{adj}}$ contains 8. The best model for each model selection criteria is found in the best subset selection matrix above. THe resulting model fits are shown in the code-chunk below. 
 
-Comparing these two model fits by means of $R^2_{\text{adj}}$, one observes that the best model results from the $R^2_{\text{adj}}$-model selection criteria. This will from now on be referred to as the reduced model. The fitted regression model for the reduced model is 
-
+One observes that all covariates are significant in the less complex model, i.e the model chosen by the BIC criteria. The model chosen by the $R^2_{\text{adj}}$ criterion contains unsignificant variables as well. To choose the best of these two models we also look at how BIC and $R^2_{\text{adj}}$ behaves with varying included covariates. If one look at the plot of $R^2_{\text{adj}}$ one observes that the $R^2_{\text{adj}}$ is pretty much stable in the interval 5-10 covariates. However, in the BIC-plot, one observes a low at 5 covariates followed by a clear increase up to the full model. Therefore 5 covariates is closest to optimal when considering both criterions. 
+Based on this, we chose to go forward with the model selected by the BIC criterion, i.e the model with 5 covariates. This model will from now on be referred to as the reduced model.The reduced fitted regression model is given by,
 $$
-\widehat{\text{Prog}} = -328.6 - 23.0\text{Sex} + 5.6\text{Bmi} + 1.1\text{Map} -0.8\text{Tc} + 0.5\text{Ldl} + 4.7\text{Tch} + 144.9\text{Ltg} + 0.3\text{Glu}
+\widehat{\text{Prog}} = -240.0 - 22.4\text{Sex} + 5.6\text{Bmi} + 1.1\text{Map} -1.1\text{Hdl} + 99.5\text{Ltg} 
 $$
 
-```{r,eval = TRUE}
+```{r,eval = TRUE,echo = TRUE}
 bic.fit = lm(prog~sex+bmi+map+hdl+ltg,data = ds)
 summary(bic.fit)
+
 r2adj.fit = lm(prog~sex+bmi+map+tc+ldl+tch+ltg+glu,data = ds)
 summary(r2adj.fit)
 ```
-
-
 ```{r,eval = TRUE}
 model.full = summary(full)
 model.full
 ```
-
-```{r,eval = TRUE}
-model.reduced = summary(r2adj.fit)
-model.reduced
-```
-Based on the $R^2_{\text{adj}}$-metric, the reduced model performs better, i.e the reduced model explains a greater proportion of variability in the data. However, the difference is not great ($\sim 0.002$).
-
-Both models contains an equal amount of significant covariates, but the covariate tc is found to be significant at a lower level of significance. 
+As mentioned above, all included covariates in the reduced model are significant. The full model, however, contains unsignificant covariates. Including these irrelevant variables causes the precision of the estimators to decrease due to overfitting, and thus we prefer the reduced model.
 
 The overall standard error is less in the reduced model than the full, meaning that the prediction from the reduced model is more accurate.
 
+<<<<<<< HEAD
+** d) **
+
+```{r,eval = TRUE}
+p_age = model.full$coefficients['age','Pr(>|t|)']
+p_tc =  model.full$coefficients['tc','Pr(>|t|)']
+p_ldl =  model.full$coefficients['ldl','Pr(>|t|)']
+p_tch =  model.full$coefficients['tch','Pr(>|t|)']
+p_glu =  model.full$coefficients['glu','Pr(>|t|)']
+p_tot = p_age*p_tc*p_ldl*p_tch*p_glu
+p_tot
+
+#model.test = lm(prog~age+tc+ldl+tch+glu,data = ds)
+#print(anova(full,model.test))
+```
+=======
 The estimated regression parameters is lower in the reduced model, i.e the contribution to the response from a unit increase of a single covariate, while all others are kept constant, are lower in the reduced model. 
+
+**d) **
+
+
+>>>>>>> 766c2cf005cb76efe544d6aadc820cf15234dd25

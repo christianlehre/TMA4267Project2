@@ -89,7 +89,7 @@ $$
 The F-test yields a low p-value, and the null-hypothesis is rejected. Thus, the regression is significant.
 
 **c)**
-```{r,eval = TRUE}
+```{r,eval = TRUE,echo = FALSE}
 library(leaps)
 allsubs <- regsubsets(prog ~.,data = ds, nvmax = 10)
 allsummary <- summary(allsubs)

@@ -17,13 +17,18 @@ knitr::opts_chunk$set(warning=FALSE)
 ds <-  read.csv("https://web.stanford.edu/~hastie/CASI_files/DATA/diabetes.csv",sep = ",")
 #apply(ds,2,summary)
 #pairs(ds,pch = '.')
+library(ggplot2)
 full <- lm(prog ~.,data = ds)
-#summary(full)
-#plot(full$fitted, rstudent(full), pch = 20)
-#qqnorm(rstudent(full),pch = 20)
-#qqline(rstudent(full),col = 2)
-#library(nortest)
-#ad.test(rstudent(full))
+summary(full)
+plot(full$fitted, rstudent(full), pch = 20)
+ggplot(full,aes(full$fitted,rstudent(full))) + geom_point(pch= 21) + geom_hline(yintercept = 0,linetype = 'dashed') + geom_smooth(se = FALSE,col = 'red',size = 0.5,method = 'loess')
+#plot(lm(rstudent(full)~full$fitted))
+qqnorm(rstudent(full),pch = 20)
+qqline(rstudent(full),col = 2)
+library(nortest)
+ad.test(rstudent(full))
+
+
 ```
 **a)**
 
@@ -80,7 +85,7 @@ For the p-value to be valid, the assumption of independently and identically nor
 
 The Anderson-Darling normality test yields a high p-value, and thus the hypothesis that the residuals are normally distributed is accepted. 
 However, one observes from figure 2 that the studentized residuals are heteroscedatic, and thus the errors are heteroscedatic. This is problematic, as the linear model assumes homoscedatic errors.
-There is also no evidence of any non-linear effects of the covariates looking at the studentized residuals. Or does the residuals lie a bit over the zero mean in the beginning and below in the end(??).
+There is no clear evidence of any non-linear effects of the covariates looking at the studentized residuals.However, there seems to be a tendency of the residuals lying above zeros in the left of the plot and then more below zero as we move to the right, which could be a sign of autocorrelated errors.
 
 Looking at the scatter-plot between all the covariated in figure 2, it is clear that some of the covariates are highly correlated, e.g tc and ldl. This results in imprecise estimation of the regression parameters, as the variance is high in this situation.
 

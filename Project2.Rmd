@@ -33,18 +33,18 @@ full <- lm(prog ~.,data = ds)
 * `Estimate` - in particular interpretation of `Intercept`
 \newline 
 Estimated regression coefficients given by 
-$$\hat{\boldsymbol{\beta}} = (X^TX)^{-1}X^T\mathbf{y}$$.
+$$\hat{\boldsymbol{\beta}} = (X^TX)^{-1}X^T\mathbf{y},$$
 \newline where $X$ is the design matrix of the regression, $\mathbf{y}$ is a vector containing the observed response values and $\hat{\boldsymbol{\beta}}$ is a vector containing the estimated regression coefficients. The interpretation of the regression coefficients is that if we increase covariate $x_j$ with one unit, and keeping all other covariates constant, the response variable changes with a factor of $\hat{\beta_j}$.
 
 * `Std.Error`
 \newline 
 Estimated standard deviation of the estimated regression coefficients, i.e the average amount that the estimated regression coefficients vary from the actual value. The Std.Error is given by 
-$$\widehat{\text{SD}}(\hat{\beta_j}) = \sqrt{\hat{\sigma}^2(X^TX)^{-1}_{jj}}$$, where $X$ is the design matrix of the regression, and $\hat{\sigma}$ is the residual standard error.
+$$\widehat{\text{SD}}(\hat{\beta_j}) = \sqrt{\hat{\sigma}^2(X^TX)^{-1}_{jj}},$$ where $X$ is the design matrix of the regression, and $\hat{\sigma}$ is the residual standard error.
 
 * `t value`
 \newline
 Value of the t-statistic for testing whether the corresponding regression coefficient is different from 0. The t-value is given by 
-$$t = \frac{\beta_j-\hat{\beta_j}}{\widehat{\text{SD}(\hat{\beta_j})}}$$, where $\beta_j$ is the regression coefficient for covariate $x_j$, $\hat{\beta_j}$ the estimated regression coefficient and $\widehat{\text{SD}(\hat{\beta_j})}$ the Std.Error as explained above.
+$$t = \frac{\beta_j-\hat{\beta_j}}{\widehat{\text{SD}(\hat{\beta_j})}},$$ where $\beta_j$ is the regression coefficient for covariate $x_j$, $\hat{\beta_j}$ the estimated regression coefficient and $\widehat{\text{SD}(\hat{\beta_j})}$ the Std.Error as explained above.
 
 * `P(>|t|)`
 \newline
@@ -56,7 +56,7 @@ Assuming a two-sided hypothesis test. $H_0$ is the null-hypothesis, $T$ is a ran
 
 **2.**
 \newline
-The estimate for the intercept can be interpreted as the value of the response when all covariates are set to zero. This is not realistic espescially for models when some of the covariates cannot simply be zero, e.g Age and Weight or binomials with values not equal to zero. 
+The estimate for the intercept can be interpreted as the value of the response when all covariates are set to zero. This is not realistic espescially for models when some of the covariates cannot simply be zero, e.g Age and Weight or binomials which does not have zero in its domain. 
 
 **3.**
 \newline
@@ -164,3 +164,7 @@ Both models contains an equal amount of significant covariates, but the covariat
 The overall standard error is less in the reduced model than the full, meaning that the prediction from the reduced model is more accurate.
 
 The estimated regression parameters is lower in the reduced model, i.e the contribution to the response from a unit increase of a single covariate, while all others are kept constant, are lower in the reduced model. 
+
+**d) **
+
+

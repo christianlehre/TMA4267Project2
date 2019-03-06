@@ -134,7 +134,8 @@ The 10 different models was calculated using the regsubsets-command in R, which 
 
 Based on BIC, the best reduced model contains 5 covariates, while the best reduced model based on $R^2_{\text{adj}}$ contains 8. The best model for each model selection criteria is found in the best subset selection matrix above. THe resulting model fits are shown in the code-chunk below. 
 
-One observes that all covariates are significant in the less complex model, i.e the model chosen by the BIC criteria. The model chosen by the $R^2_{\text{adj}}$ criterion contains unsignificant variables as well. To choose the best of these two models we also look at how BIC and $R^2_{\text{adj}}$ behaves with varying included covariates. If one look at the plot of $R^2_{\text{adj}}$ one observes that the $R^2_{\text{adj}}$ is pretty much stable in the interval 5-10 covariates. However, in the BIC-plot, one observes a low at 5 covariates followed by a clear increase up to the full model. Therefore 5 covariates is closest to optimal when considering both criterions. 
+One observes that all covariates are significant in the less complex model, i.e the model chosen by the BIC criteria. The model chosen by the $R^2_{\text{adj}}$ criterion contains unsignificant variables as well. To choose the best of these two models we also look at how BIC and $R^2_{\text{adj}}$ behaves with varying included covariates. If one look at the plot of $R^2_{\text{adj}}$ one observes that the $R^2_{\text{adj}}$ is pretty much stable in the interval 5-10 covariates. However, in the BIC-plot, one observes a low at 5 covariates followed by a clear increase up to the full model. Therefore 5 covariates is closest to optimal when considering both criterions.
+
 Based on this, we chose to go forward with the model selected by the BIC criterion, i.e the model with 5 covariates. This model will from now on be referred to as the reduced model.The reduced fitted regression model is given by,
 $$
 \widehat{\text{Prog}} = -240.0 - 22.4\text{Sex} + 5.6\text{Bmi} + 1.1\text{Map} -1.1\text{Hdl} + 99.5\text{Ltg} 
@@ -173,3 +174,90 @@ As one can observe the $p$-value of the hyphothesis test
      H_0: \beta_{age}=\beta_{tc}=\beta_{ldl}=\beta_{tch}=\beta_{glu}=0, \qquad H_1: \text{at least one} \neq 0.
 \end{equation}
 is equal to 0.007. Thus there is a low probability that all these estimated regression parameters are equal to zero and the null-hypothesis is rejected. However, as seen in exercise c) the BIC of the reduced model is better than for the full model. The rejection of the null hypothesis simply indicates that the reduced model will have a larger bias than the full model. The BIC however, consider the tradeoff between increased variance and decreased bias when increasing the number of covariates. Thus we would prefer the reduced model, as it yields a more optimal bias-variance tradeoff according to the BIC-values. 
+
+# Problem 2
+
+**a)**
+```{r,eval = TRUE}
+pvalues <-scan("https://www.math.ntnu.no/emner/TMA4267/2018v/pvalues.txt")
+
+alpha = 0.05
+rejected = 0
+for (i in pvalues){
+  if (i < alpha){
+    rejected = rejected +1
+  } 
+}
+rejected
+```
+Based on our data, and a significance level of 0.05, we reject 155 of 1000 null-hypotheses.
+A false positive finding, i.e a type 1 error, is the case when one reject a true $H_0$
+With a significance level of 0.05, we say that the probability of making a type 1 error is 0.05. 
+
+We can not say how many of these rejected null-hypothesis that were actually true, as our data only consists of the p-values. 
+However, we could try to estimate it using the number of rejected null-hypothesis and the significance level, yielding $155\cdot0.05 =$ `r rejected*alpha` type 1 errors on average.
+
+** b) **
+The Familiwise Error Rate (FWER) is the probability of making at least one type 1 error in a series of hypothesis tests. The term family comes from the family of tests, which is the technical term for a series of tests on data.
+
+To control the FWER at level 0.05, one would adjust the threshold for where the rejection of the null-hypothesis is made such that the probability of making at least one type 1 error is stable on 0.05.
+
+The cutoff for p-values when using the Bonferroni method should be set to 0.05 divided by the number of null-hypothesis, so in our case this number would yield $0.05/1000 = 5*10^{-5}$.
+
+```{r,eval = TRUE}
+pvalues <-scan("https://www.math.ntnu.no/emner/TMA4267/2018v/pvalues.txt")
+
+alpha = 0.05/1000
+rejected = 0
+for (i in pvalues){
+  if (i < alpha){
+    rejected = rejected +1
+  } 
+}
+rejected
+```
+For our p-values, the number of rejections with the Bonferroni method is 50.
+
+** c) **
+
+Assuming that the first 900 null-hypotheses true, and last 100 false. We first investigate the number of type 1 and type 2 errors with $\alpha = 0.05$ as in problem a)
+```{r,eval = TRUE}
+
+errors<-function(alpha){
+  typ1 = 0
+  typ2 = 0
+  for (i in seq(from = 1, to = length(pvalues))){
+    if (i <= 900){
+      if (pvalues[i] < alpha){
+        typ1 = typ1 +1
+      }
+    }
+  
+    else{
+      if (pvalues[i] >= alpha){
+        typ2 = typ2 +1
+      }
+    }
+  }
+  return (c(typ1,typ2))
+}
+
+alpha_a = 0.05
+alpha_b = 0.05/length(pvalues)
+
+print("Type 1 error a):")
+print(errors(alpha_a)[1])
+print("Type 2 error a):")
+print(errors(alpha_a)[2])
+
+print("Type 1 error b):")
+print(errors(alpha_b)[1])
+print("Type 2 error b):")
+print(errors(alpha_b)[2])
+```
+With $\alpha = 0.05$ as in problem a), we observe 55 type 1 errors and 0 type 2 errors. Which indicates that we could probably lower the significance level in this situation. However, it depends on how important it is to avoid type 2 errors compared to avoiding type 1 errors.
+
+For $\alpha = 5\cdot 10^{-5}$ as in problem b) the same code yields,
+
+With $\alpha = 5\cdot 10^{-5}$ as in problem b), we observe 0 type 1 errors and 50 type 2 errors. Which indicates that we could probably increase the significance level in this situation. However, it depends on how important it is to avoid type 1 errors compared to avoiding type 2 errors.
+>>>>>>> bb17ffa89f1b9468bffdd2f6e27562c8e59002ac

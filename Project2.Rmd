@@ -155,7 +155,6 @@ As mentioned above, all included covariates in the reduced model are significant
 
 The overall standard error is less in the reduced model than the full, meaning that the prediction from the reduced model is more accurate.
 
-<<<<<<< HEAD
 ** d) **
 
 ```{r,eval = TRUE}
@@ -170,10 +169,89 @@ p_tot
 #model.test = lm(prog~age+tc+ldl+tch+glu,data = ds)
 #print(anova(full,model.test))
 ```
-=======
-The estimated regression parameters is lower in the reduced model, i.e the contribution to the response from a unit increase of a single covariate, while all others are kept constant, are lower in the reduced model. 
 
-**d) **
+# Problem 2
 
+**a)**
+```{r,eval = TRUE}
+pvalues <-scan("https://www.math.ntnu.no/emner/TMA4267/2018v/pvalues.txt")
 
->>>>>>> 766c2cf005cb76efe544d6aadc820cf15234dd25
+alpha = 0.05
+rejected = 0
+for (i in pvalues){
+  if (i < alpha){
+    rejected = rejected +1
+  } 
+}
+rejected
+```
+Based on our data, and a significance level of 0.05, we reject 155 of 1000 null-hypotheses.
+A false positive finding, i.e a type 1 error, is the case when one reject a true $H_0$
+With a significance level of 0.05, we say that the probability of making a type 1 error is 0.05. 
+
+We can not say how many of these rejected null-hypothesis that were actually true, as our data only consists of the p-values. 
+However, we could try to estimate it using the number of rejected null-hypothesis and the significance level, yielding $155\cdot0.05 = $`r rejected*alpha` type 1 errors on average.
+
+** b) **
+The Familiwise Error Rate (FWER) is the probability of making at least one type 1 error in a series of hypothesis tests. The term family comes from the family of tests, which is the technical term for a series of tests on data.
+
+To control the FWER at level 0.05, one would adjust the threshold for where the rejection of the null-hypothesis is made such that the probability of making at least one type 1 error is stable on 0.05.
+
+The cutoff for p-values when using the Bonferroni method should be set to 0.05 divided by the number of null-hypothesis, so in our case this number would yield $0.05/1000 = 5*10^{-5}$.
+
+```{r,eval = TRUE}
+pvalues <-scan("https://www.math.ntnu.no/emner/TMA4267/2018v/pvalues.txt")
+
+alpha = 0.05/1000
+rejected = 0
+for (i in pvalues){
+  if (i < alpha){
+    rejected = rejected +1
+  } 
+}
+rejected
+```
+For our p-values, the number of rejections with the Bonferroni method is 50.
+
+** c) **
+
+Assuming that the first 900 null-hypotheses true, and last 100 false. We first investigate the number of type 1 and type 2 errors with $\alpha = 0.05$ as in problem a)
+```{r,eval = TRUE}
+
+errors<-function(alpha){
+  typ1 = 0
+  typ2 = 0
+  for (i in seq(from = 1, to = length(pvalues))){
+    if (i <= 900){
+      if (pvalues[i] < alpha){
+        typ1 = typ1 +1
+      }
+    }
+  
+    else{
+      if (pvalues[i] >= alpha){
+        typ2 = typ2 +1
+      }
+    }
+  }
+  return (c(typ1,typ2))
+}
+
+alpha_a = 0.05
+alpha_b = 0.05/length(pvalues)
+
+print("Type 1 error a):")
+print(errors(alpha_a)[1])
+print("Type 2 error a):")
+print(errors(alpha_a)[2])
+
+print("Type 1 error b):")
+print(errors(alpha_b)[1])
+print("Type 2 error b):")
+print(errors(alpha_b)[2])
+```
+With $\alpha = 0.05$ as in problem a), we observe 55 type 1 errors and 0 type 2 errors. Which indicates that we could probably lower the significance level in this situation. However, it depends on how important it is to avoid type 2 errors compared to avoiding type 1 errors.
+
+For $\alpha = 5\cdot 10^{-5}$ as in problem b) the same code yields,
+
+With $\alpha = 5\cdot 10^{-5}$ as in problem b), we observe 0 type 1 errors and 50 type 2 errors. Which indicates that we could probably increase the significance level in this situation. However, it depends on how important it is to avoid type 1 errors compared to avoiding type 2 errors.

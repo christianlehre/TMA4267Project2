@@ -61,6 +61,7 @@ The estimate for the intercept can be interpreted as the value of the response w
 **3.**
 \newline
 The estimated regression coefficient for BMI can be interpreted as the change in the response variable when the BMI increases by one. In our example it is given as 5.6, which means that if a person increase his or her BMI by 1, the estimate for the progression of the disease after one year will increase by 5.6.
+
 **4.**
 \newline
 The estimated error standard deviation is found in the summary as the Residual standard error, and is interpreted as the mean deviance between the estimated and true regression line. The estimated error variance is found by squaring the Residual standard error. 

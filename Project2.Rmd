@@ -68,7 +68,7 @@ The formula for the estimated error variance is
 $$\hat{\sigma}^2 = \frac{RSS}{n-p} = \frac{\sum_{i = 1}^n(y_i - \hat{y_i})^2}{n-p}$$
 where n is the number of observations and p is the number of covariates in the model.
 
-*5.*
+**5.**
 \newline
 The covariates that are significant at level 0.05 are the ones with a p-value below this. From the printed model summary we see that the covariates sex, bmi, map and ltg are significant at level 0.05. The null hypothesis related to this p-value is that the covariates are equal to zero, while the alternative hypothesis is that they are unequal to zero,
 \begin{equation}
@@ -76,7 +76,7 @@ The covariates that are significant at level 0.05 are the ones with a p-value be
 \end{equation}
 For the p-value to be valid, the assumption of independently and identically normally distributed errors, i.e., $\varepsilon \sim N(0,\sigma^2)$, is needed.
 
-*b) Model Evaluation*
+**b) Model Evaluation**
 
 The Anderson-Darling normality test yields a high p-value, and thus the hypothesis that the residuals are normally distributed is accepted. 
 However, one observes from figure 2 that the studentized residuals are heteroscedatic, and thus the errors are heteroscedatic. This is problematic, as the linear model assumes homoscedatic errors.
@@ -110,7 +110,7 @@ which.min(allsummary$bic)
 plot(allsummary$bic,xlab = 'variables',ylab = 'BIC',type = 'l')
 plot(allsubs,scale = 'bic')
 ```
-The more covariates included in a model, the more complex the model is, and the model becomes less biased. Thus, by the biad-variance tradeoff, the more complex a model is, the higher the variance of the resulting model. When doing predictions, one obtains a more accurate prediction if the variance is low. Hence, a reduced model results in lower variance, and might perform better when doing predictions. 
+The more covariates included in a model, the more complex the model is, and the model becomes less biased. Thus, by the bias-variance tradeoff, the more complex a model is, the higher the variance of the resulting model. When doing predictions, one obtains a more accurate prediction if the variance is low. Hence, a reduced model results in lower variance, and might perform better when doing predictions. 
 
 As for the best subset model selection method, one fit for every covariate $k = 0,...,p$, all the $p\choose k$ models containing k covariates, and pick the best model (which contains an equal amount of covariates) in terms of the $R^2$-metric. Once the methods has found the best $p$ models each containing a different amount of covariates, the method choose the ultimately best model in terms of some model choice criteria, e.g BIC or $R^2_{\text{adj}}$.
 

@@ -155,7 +155,7 @@ As mentioned above, all included covariates in the reduced model are significant
 
 The overall standard error is less in the reduced model than the full, meaning that the prediction from the reduced model is more accurate.
 
-** d) **
+**d)**
 
 ```{r,eval = TRUE}
 p_age = model.full$coefficients['age','Pr(>|t|)']
@@ -190,9 +190,9 @@ A false positive finding, i.e a type 1 error, is the case when one reject a true
 With a significance level of 0.05, we say that the probability of making a type 1 error is 0.05. 
 
 We can not say how many of these rejected null-hypothesis that were actually true, as our data only consists of the p-values. 
-However, we could try to estimate it using the number of rejected null-hypothesis and the significance level, yielding $155\cdot0.05 = $`r rejected*alpha` type 1 errors on average.
+However, we could try to estimate it using the number of rejected null-hypothesis and the significance level, yielding $155\cdot0.05 =$ `r rejected*alpha` type 1 errors on average.
 
-** b) **
+**b) **
 The Familiwise Error Rate (FWER) is the probability of making at least one type 1 error in a series of hypothesis tests. The term family comes from the family of tests, which is the technical term for a series of tests on data.
 
 To control the FWER at level 0.05, one would adjust the threshold for where the rejection of the null-hypothesis is made such that the probability of making at least one type 1 error is stable on 0.05.
@@ -213,7 +213,7 @@ rejected
 ```
 For our p-values, the number of rejections with the Bonferroni method is 50.
 
-** c) **
+**c)**
 
 Assuming that the first 900 null-hypotheses true, and last 100 false. We first investigate the number of type 1 and type 2 errors with $\alpha = 0.05$ as in problem a)
 ```{r,eval = TRUE}
@@ -240,15 +240,17 @@ errors<-function(alpha){
 alpha_a = 0.05
 alpha_b = 0.05/length(pvalues)
 
+error_a = errors(alpha_a)
+error_b = errors(alpha_b)
 print("Type 1 error a):")
-print(errors(alpha_a)[1])
+print(error_a[1])
 print("Type 2 error a):")
-print(errors(alpha_a)[2])
+print(error_a[2])
 
 print("Type 1 error b):")
-print(errors(alpha_b)[1])
+print(error_b[1])
 print("Type 2 error b):")
-print(errors(alpha_b)[2])
+print(error_b[2])
 ```
 With $\alpha = 0.05$ as in problem a), we observe 55 type 1 errors and 0 type 2 errors. Which indicates that we could probably lower the significance level in this situation. However, it depends on how important it is to avoid type 2 errors compared to avoiding type 1 errors.
 

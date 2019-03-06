@@ -151,11 +151,9 @@ summary(r2adj.fit)
 model.full = summary(full)
 model.full
 ```
-As mentioned above, all included covariates in the reduced model are significant. The full model, however, contains unsignificant covariates. Including these irrelevant variables causes the precision of the estimators to decrease due to overfitting, and thus we prefer the reduced model.
+As mentioned above, all included covariates in the reduced model are significant. The full model, however, contains unsignificant covariates. Including these irrelevant variables causes the precision of the estimators to decrease due to overfitting. The overall standard error is less in the reduced model than the full, meaning that the prediction from the reduced model is more accurate.
 
-The overall standard error is less in the reduced model than the full, meaning that the prediction from the reduced model is more accurate.
 
-<<<<<<< HEAD
 ** d) **
 
 ```{r,eval = TRUE}
@@ -170,10 +168,8 @@ p_tot
 #model.test = lm(prog~age+tc+ldl+tch+glu,data = ds)
 #print(anova(full,model.test))
 ```
-=======
-The estimated regression parameters is lower in the reduced model, i.e the contribution to the response from a unit increase of a single covariate, while all others are kept constant, are lower in the reduced model. 
-
-**d) **
-
-
->>>>>>> 766c2cf005cb76efe544d6aadc820cf15234dd25
+As one can observe the $p$-value of the hyphothesis test
+\begin{equation}
+     H_0: \beta_{age}=\beta_{tc}=\beta_{ldl}=\beta_{tch}=\beta_{glu}=0, \qquad H_1: \text{at least one} \neq 0.
+\end{equation}
+is equal to 0.007. Thus there is a low probability that all these estimated regression parameters are equal to zero and the null-hypothesis is rejected. However, as seen in exercise c) the BIC of the reduced model is better than for the full model. The rejection of the null hypothesis simply indicates that the reduced model will have a larger bias than the full model. The BIC however, consider the tradeoff between increased variance and decreased bias when increasing the number of covariates. Thus we would prefer the reduced model, as it yields a more optimal bias-variance tradeoff according to the BIC-values. 

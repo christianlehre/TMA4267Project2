@@ -67,26 +67,35 @@ The estimated error standard deviation is found in the summary as the Residual s
 The formula for the estimated error variance is 
 $$\hat{\sigma}^2 = \frac{RSS}{n-p} = \frac{\sum_{i = 1}^n(y_i - \hat{y_i})^2}{n-p}$$
 where n is the number of observations and p is the number of covariates in the model.
-**5.**
+
+*5.*
 \newline
 The covariates that are significant at level 0.05 are the ones with a p-value below this. From the printed model summary we see that the covariates sex, bmi, map and ltg are significant at level 0.05. The null hypothesis related to this p-value is that the covariates are equal to zero, while the alternative hypothesis is that they are unequal to zero,
 \begin{equation}
-     H_0: \beta_j=0, \qquad H_1: \beta \neq 0
+     H_0: \beta_j=0, \qquad H_1: \beta \neq 0.
 \end{equation}
+For the p-value to be valid, the assumption of independently and identically normally distributed errors, i.e., $\varepsilon \sim N(0,\sigma^2)$, is needed.
 
+*b) Model Evaluation*
 
-**b) Model Evaluation**
-
-In terms of proportion of variance explained by the model, the fit is pretty poor. Both $R^2$ and adjusted $R^2$ yields a pretty low value of roughly 51% explained variance. 
 The Anderson-Darling normality test yields a high p-value, and thus the hypothesis that the residuals are normally distributed is accepted. 
-One observes from figure 2 that the studentized residuals are heteroscedatic, and thus the errors are heteroscedatic. This is problematic, as the linear model assumes homoscedatic errors.
-There is also no evidence of any non-linear effects of the covariates looking at the studentized residuals
+However, one observes from figure 2 that the studentized residuals are heteroscedatic, and thus the errors are heteroscedatic. This is problematic, as the linear model assumes homoscedatic errors.
+There is also no evidence of any non-linear effects of the covariates looking at the studentized residuals. Or does the residuals lie a bit over the zero mean in the beginning and below in the end(??).
 
-To look into the significance of the regression one can use the so-called F-test: 
+To look into the significance of the regression one can use the F-test: 
 $$
 H_0: \beta_j = 0 \;\;\forall j = 0, \dots ,p \quad H_1: \text{at least one} \; \beta_j \ne 0
 $$
-The F-test yields a low p-value, and the null-hypothesis is rejected. Thus, the regression is significant.
+For this model the F-test yields a low p-value, and the null-hypothesis is rejected. Thus, the regression is significant.
+
+The $\textbf{Multiple R-squared}$ in figure 1 is the coefficient of determination defined by 
+\begin{equation}
+R^2=\frac{\sum_{i=1}^n (\hat{y_i}-\bar{y})^2}{\sum_{i=1}^n ({y_i}-\bar{y})^2}=1-\frac{\hat{\varepsilon}_i^2}{\sum_{i=1}^n ({y_i}-\bar{y})^2},
+\end{equation}
+which is a measurement of the amount of variance that is explained by the model. We observe that the closer $R^2$ is to 1, the smaller the residual
+sum of squares $\varepsilon_i^2$ are, and thus the better the fit to the data. 
+
+In terms of proportion of variance explained by this model, the fit is pretty poor. Both $R^2$ and adjusted $R^2$ yields a pretty low value of roughly 51% explained variance.
 
 **c)**
 ```{r,eval = TRUE,echo = FALSE}

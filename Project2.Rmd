@@ -124,9 +124,12 @@ The 10 different models was calculated using the regsubsets-command in R, which 
 
 Based on BIC, the best reduced model contains 5 covariates, while the best reduced model based on $R^2_{\text{adj}}$ contains 8. The best model for each model selection criteria is found in the best subset selection matrix above. THe resulting model fits are shown in the code-chunk below. 
 
-Comparing these two model fits by means of $R^2_{\text{adj}}$, one observes that the best model results from the $R^2_{\text{adj}}$-model selection criteria. 
+Comparing these two model fits by means of $R^2_{\text{adj}}$, one observes that the best model results from the $R^2_{\text{adj}}$-model selection criteria. This will from now on be referred to as the reduced model. The fitted regression model for the reduced model is 
 
- - compare chosen model with full model -
+$$
+\widehat{\text{Prog}} = -328.6 - 23.0\text{Sex} + 5.6\text{Bmi} + 1.1\text{Map} -0.8\text{Tc} + 0.5\text{Ldl} + 4.7\text{Tch} + 144.9\text{Ltg} + 0.3\text{Glu}
+$$
+
 ```{r,eval = TRUE}
 bic.fit = lm(prog~sex+bmi+map+hdl+ltg,data = ds)
 summary(bic.fit)
@@ -135,4 +138,19 @@ summary(r2adj.fit)
 ```
 
 
+```{r,eval = TRUE}
+model.full = summary(full)
+model.full
+```
 
+```{r,eval = TRUE}
+model.reduced = summary(r2adj.fit)
+model.reduced
+```
+Based on the $R^2_{\text{adj}}$-metric, the reduced model performs better, i.e the reduced model explains a greater proportion of variability in the data. However, the difference is not great ($\sim 0.002$).
+
+Both models contains an equal amount of significant covariates, but the covariate tc is found to be significant at a lower level of significance. 
+
+The overall standard error is less in the reduced model than the full, meaning that the prediction from the reduced model is more accurate.
+
+The estimated regression parameters is lower in the reduced model, i.e the contribution to the response from a unit increase of a single covariate, while all others are kept constant, are lower in the reduced model. 

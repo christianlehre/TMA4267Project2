@@ -13,17 +13,17 @@ knitr::opts_chunk$set(warning=FALSE)
 ```
 
 # Problem 1
-```{r,eval = TRUE}
+```{r,eval = TRUE,echo = FALSE}
 ds <-  read.csv("https://web.stanford.edu/~hastie/CASI_files/DATA/diabetes.csv",sep = ",")
-apply(ds,2,summary)
-pairs(ds,pch = '.')
+#apply(ds,2,summary)
+#pairs(ds,pch = '.')
 full <- lm(prog ~.,data = ds)
-summary(full)
-plot(full$fitted, rstudent(full), pch = 20)
-qqnorm(rstudent(full),pch = 20)
-qqline(rstudent(full),col = 2)
-library(nortest)
-ad.test(rstudent(full))
+#summary(full)
+#plot(full$fitted, rstudent(full), pch = 20)
+#qqnorm(rstudent(full),pch = 20)
+#qqline(rstudent(full),col = 2)
+#library(nortest)
+#ad.test(rstudent(full))
 ```
 **a)**
 
@@ -68,7 +68,7 @@ The formula for the estimated error variance is
 $$\hat{\sigma}^2 = \frac{RSS}{n-p} = \frac{\sum_{i = 1}^n(y_i - \hat{y_i})^2}{n-p}$$
 where n is the number of observations and p is the number of covariates in the model.
 
-*5.*
+**5.**
 \newline
 The covariates that are significant at level 0.05 are the ones with a p-value below this. From the printed model summary we see that the covariates sex, bmi, map and ltg are significant at level 0.05. The null hypothesis related to this p-value is that the covariates are equal to zero, while the alternative hypothesis is that they are unequal to zero,
 \begin{equation}
@@ -76,7 +76,7 @@ The covariates that are significant at level 0.05 are the ones with a p-value be
 \end{equation}
 For the p-value to be valid, the assumption of independently and identically normally distributed errors, i.e., $\varepsilon \sim N(0,\sigma^2)$, is needed.
 
-*b) Model Evaluation*
+**b) Model Evaluation**
 
 The Anderson-Darling normality test yields a high p-value, and thus the hypothesis that the residuals are normally distributed is accepted. 
 However, one observes from figure 2 that the studentized residuals are heteroscedatic, and thus the errors are heteroscedatic. This is problematic, as the linear model assumes homoscedatic errors.
@@ -98,7 +98,7 @@ sum of squares $\varepsilon_i^2$ are, and thus the better the fit to the data.
 In terms of proportion of variance explained by this model, the fit is pretty poor. Both $R^2$ and adjusted $R^2$ yields a pretty low value of roughly 51% explained variance.
 
 **c)**
-```{r,eval = TRUE,echo = FALSE}
+```{r,eval = FALSE,echo = FALSE}
 library(leaps)
 allsubs <- regsubsets(prog ~.,data = ds, nvmax = 10)
 allsummary <- summary(allsubs)
@@ -139,7 +139,7 @@ $$
 \widehat{\text{Prog}} = -328.6 - 23.0\text{Sex} + 5.6\text{Bmi} + 1.1\text{Map} -0.8\text{Tc} + 0.5\text{Ldl} + 4.7\text{Tch} + 144.9\text{Ltg} + 0.3\text{Glu}
 $$
 
-```{r,eval = TRUE}
+```{r,eval = TRUE,echo = TRUE}
 bic.fit = lm(prog~sex+bmi+map+hdl+ltg,data = ds)
 summary(bic.fit)
 r2adj.fit = lm(prog~sex+bmi+map+tc+ldl+tch+ltg+glu,data = ds)

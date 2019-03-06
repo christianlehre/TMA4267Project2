@@ -117,7 +117,7 @@ which.min(allsummary$bic)
 plot(allsummary$bic,xlab = 'variables',ylab = 'BIC',type = 'l')
 plot(allsubs,scale = 'bic')
 ```
-The more covariates included in a model, the more complex the model is, and the model becomes less biased. Thus, by the biad-variance tradeoff, the more complex a model is, the higher the variance of the resulting model. When doing predictions, one obtains a more accurate prediction if the variance is low. Hence, a reduced model results in lower variance, and might perform better when doing predictions. 
+The more covariates included in a model, the more complex the model is, and the model becomes less biased. Thus, by the bias-variance tradeoff, the more complex a model is, the higher the variance of the resulting model. When doing predictions, one obtains a more accurate prediction if the variance is low. Hence, a reduced model results in lower variance, and might perform better when doing predictions. 
 
 As for the best subset model selection method, one fit for every covariate $k = 0,...,p$, all the $p\choose k$ models containing k covariates, and pick the best model (which contains an equal amount of covariates) in terms of the $R^2$-metric. Once the methods has found the best $p$ models each containing a different amount of covariates, the method choose the ultimately best model in terms of some model choice criteria, e.g BIC or $R^2_{\text{adj}}$.
 
@@ -139,7 +139,8 @@ The 10 different models was calculated using the regsubsets-command in R, which 
 
 Based on BIC, the best reduced model contains 5 covariates, while the best reduced model based on $R^2_{\text{adj}}$ contains 8. The best model for each model selection criteria is found in the best subset selection matrix above. THe resulting model fits are shown in the code-chunk below. 
 
-One observes that all covariates are significant in the less complex model, i.e the model chosen by the BIC criteria. The model chosen by the $R^2_{\text{adj}}$ criterion contains unsignificant variables as well. To choose the best of these two models we also look at how BIC and $R^2_{\text{adj}}$ behaves with varying included covariates. If one look at the plot of $R^2_{\text{adj}}$ one observes that the $R^2_{\text{adj}}$ is pretty much stable in the interval 5-10 covariates. However, in the BIC-plot, one observes a low at 5 covariates followed by a clear increase up to the full model. Therefore 5 covariates is closest to optimal when considering both criterions. 
+One observes that all covariates are significant in the less complex model, i.e the model chosen by the BIC criteria. The model chosen by the $R^2_{\text{adj}}$ criterion contains unsignificant variables as well. To choose the best of these two models we also look at how BIC and $R^2_{\text{adj}}$ behaves with varying included covariates. If one look at the plot of $R^2_{\text{adj}}$ one observes that the $R^2_{\text{adj}}$ is pretty much stable in the interval 5-10 covariates. However, in the BIC-plot, one observes a low at 5 covariates followed by a clear increase up to the full model. Therefore 5 covariates is closest to optimal when considering both criterions.
+
 Based on this, we chose to go forward with the model selected by the BIC criterion, i.e the model with 5 covariates. This model will from now on be referred to as the reduced model.The reduced fitted regression model is given by,
 $$
 \widehat{\text{Prog}} = -240.0 - 22.4\text{Sex} + 5.6\text{Bmi} + 1.1\text{Map} -1.1\text{Hdl} + 99.5\text{Ltg} 
@@ -156,9 +157,8 @@ summary(r2adj.fit)
 model.full = summary(full)
 model.full
 ```
-As mentioned above, all included covariates in the reduced model are significant. The full model, however, contains unsignificant covariates. Including these irrelevant variables causes the precision of the estimators to decrease due to overfitting, and thus we prefer the reduced model.
+As mentioned above, all included covariates in the reduced model are significant. The full model, however, contains unsignificant covariates. Including these irrelevant variables causes the precision of the estimators to decrease due to overfitting. The overall standard error is less in the reduced model than the full, meaning that the prediction from the reduced model is more accurate.
 
-The overall standard error is less in the reduced model than the full, meaning that the prediction from the reduced model is more accurate.
 
 **d)**
 
@@ -174,6 +174,11 @@ p_tot
 #model.test = lm(prog~age+tc+ldl+tch+glu,data = ds)
 #print(anova(full,model.test))
 ```
+As one can observe the $p$-value of the hyphothesis test
+\begin{equation}
+     H_0: \beta_{age}=\beta_{tc}=\beta_{ldl}=\beta_{tch}=\beta_{glu}=0, \qquad H_1: \text{at least one} \neq 0.
+\end{equation}
+is equal to 0.007. Thus there is a low probability that all these estimated regression parameters are equal to zero and the null-hypothesis is rejected. However, as seen in exercise c) the BIC of the reduced model is better than for the full model. The rejection of the null hypothesis simply indicates that the reduced model will have a larger bias than the full model. The BIC however, consider the tradeoff between increased variance and decreased bias when increasing the number of covariates. Thus we would prefer the reduced model, as it yields a more optimal bias-variance tradeoff according to the BIC-values. 
 
 # Problem 2
 
@@ -262,3 +267,4 @@ With $\alpha = 0.05$ as in problem a), we observe 55 type 1 errors and 0 type 2 
 For $\alpha = 5\cdot 10^{-5}$ as in problem b) the same code yields,
 
 With $\alpha = 5\cdot 10^{-5}$ as in problem b), we observe 0 type 1 errors and 50 type 2 errors. Which indicates that we could probably increase the significance level in this situation. However, it depends on how important it is to avoid type 1 errors compared to avoiding type 2 errors.
+>>>>>>> bb17ffa89f1b9468bffdd2f6e27562c8e59002ac

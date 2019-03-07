@@ -15,20 +15,6 @@ knitr::opts_chunk$set(warning=FALSE)
 # Problem 1
 ```{r,eval = TRUE,echo = FALSE}
 ds <-  read.csv("https://web.stanford.edu/~hastie/CASI_files/DATA/diabetes.csv",sep = ",")
-#apply(ds,2,summary)
-#pairs(ds,pch = '.')
-library(ggplot2)
-full <- lm(prog ~.,data = ds)
-summary(full)
-plot(full$fitted, rstudent(full), pch = 20)
-ggplot(full,aes(full$fitted,rstudent(full))) + geom_point(pch= 21) + geom_hline(yintercept = 0,linetype = 'dashed') + geom_smooth(se = FALSE,col = 'red',size = 0.5,method = 'loess')
-#plot(lm(rstudent(full)~full$fitted))
-qqnorm(rstudent(full),pch = 20)
-qqline(rstudent(full),col = 2)
-library(nortest)
-ad.test(rstudent(full))
-
-
 ```
 **a)**
 
@@ -48,30 +34,30 @@ $$\widehat{\text{SD}}(\hat{\beta_j}) = \sqrt{\hat{\sigma}^2(X^TX)^{-1}_{jj}},$$ 
 * `t value`
 \newline
 Value of the t-statistic for testing whether the corresponding regression coefficient is different from 0. The t-value is given by 
-$$t = \frac{\beta_j-\hat{\beta_j}}{\widehat{\text{SD}(\hat{\beta_j})}},$$ where $\beta_j$ is the regression coefficient for covariate $x_j$, $\hat{\beta_j}$ the estimated regression coefficient and $\widehat{\text{SD}(\hat{\beta_j})}$ the Std.Error as explained above.
+$$t = \frac{\hat{\beta_j}-\beta_j}{\widehat{\text{SD}(\hat{\beta_j})}}=\frac{\hat{\beta_j}}{\widehat{\text{SD}(\hat{\beta_j})}},$$ where $\beta_j$ is the regression coefficient for covariate $x_j$, $\hat{\beta_j}$ the estimated regression coefficient and $\widehat{\text{SD}(\hat{\beta_j})}$ the Std.Error as explained above.
 
 * `P(>|t|)`
 \newline
 Probability of observing a more extreme value than $t$ under the null hypothesis, i.e the so-called p-value used in hypothesis testing. The p-value is given by
 $$
-2P(T < |t| : H_0)
+2P(T > |t| : H_0),
 $$
-Assuming a two-sided hypothesis test. $H_0$ is the null-hypothesis, $T$ is a random vector and $t$ is the observed value
+where $H_0$ is the null-hypothesis, $T \sim t_{n-p}$ is a random variable and $t$ is the observed value calculated from the formula above. The factor 2 results from the test being two-sided.
 
 **2.**
 \newline
-The estimate for the intercept can be interpreted as the value of the response when all covariates are set to zero. This is not realistic espescially for models when some of the covariates cannot simply be zero, e.g Age and Weight or binomials which does not have zero in its domain. 
+The estimate for the intercept is the value of the response when all covariates are set to zero. In some models this is not realistic, as some of the covariates cannot be zero, e.g. Age and BMI.
 
 **3.**
 \newline
-The estimated regression coefficient for BMI can be interpreted as the change in the response variable when the BMI increases by one. In our example it is given as 5.6, which means that if a person increase his or her BMI by 1, the estimate for the progression of the disease after one year will increase by 5.6.
+The estimated regression coefficient for BMI can be interpreted as the change in the response variable when the BMI increases by one unit. In our example it is given as 5.6, which means that if a person increase his or her BMI by 1, the estimate for the progression of the disease after one year will increase by 5.6.
 
 **4.**
 \newline
-The estimated error standard deviation is found in the summary as the Residual standard error, and is interpreted as the mean deviance between the estimated and true regression line. The estimated error variance is found by squaring the Residual standard error. 
+The estimated error standard deviation is found in the summary as the $\textbf{Residual standard error}$, and is interpreted as the mean deviance between the estimated regression line and the observed values. Another interpretation is the measure of spread around the regression line. The estimated error variance is found by squaring the Residual standard error. 
 The formula for the estimated error variance is 
-$$\hat{\sigma}^2 = \frac{RSS}{n-p} = \frac{\sum_{i = 1}^n(y_i - \hat{y_i})^2}{n-p}$$
-where n is the number of observations and p is the number of covariates in the model.
+$$\hat{\sigma}^2 = \frac{RSS}{n-p} = \frac{\sum_{i = 1}^n(y_i - \hat{y_i})^2}{n-p},$$
+where n is the number of observations and p is the number of covariates in the model. In this model we find $\hat{\sigma}^2=54.16^2$
 
 **5.**
 \newline
@@ -83,15 +69,20 @@ For the p-value to be valid, the assumption of independently and identically nor
 
 **b) Model Evaluation**
 
-The Anderson-Darling normality test yields a high p-value, and thus the hypothesis that the residuals are normally distributed is accepted. 
-However, one observes from figure 2 that the studentized residuals are heteroscedatic, and thus the errors are heteroscedatic. This is problematic, as the linear model assumes homoscedatic errors.
-There is no clear evidence of any non-linear effects of the covariates looking at the studentized residuals.However, to investigate this further we made a plot of the conditional mean  there seems to be a tendency of the residuals lying above zeros in the left of the plot and then more below zero as we move to the right, which could be a sign of autocorrelated errors.
+The Anderson-Darling normality test yields a high p-value, and thus the hypothesis that the residuals are normally distributed is accepted.By observing the Q-Q plot as well this seems to be a reasonable hypothesis for the model.  However, one observes from figure 2 that the studentized residuals are heteroscedatic, which contradicts the model assumptions of homoscedatic error.
+There is also some evidence of non-linear effects of the covariates looking at the studentized residuals, especially at the tails. To investigate this further, we made a plot of the conditional mean, which is marked as a red curve in the residual plot. 
+```{r,eval = TRUE}
+library(ggplot2)
+full <- lm(prog ~.,data = ds)
+ggplot(full,aes(full$fitted,rstudent(full))) + geom_point(pch= 21) + geom_hline(yintercept = 0,linetype = 'dashed') + geom_smooth(se = FALSE,col = 'red',size = 0.5,method = 'loess') + labs(x = 'fitted values', y = 'Studentized residuals',title = 'Residual plot',subtitle = 'Fitted values against studentized residuals' )
+```
+The conditional mean supports our assumption of non-linearity. This might imply autocorrelation of the errors, which disagrees with the model assumption of uncorrelated errors. However, the trend is not very clear.
 
-Looking at the scatter-plot between all the covariated in figure 2, it is clear that some of the covariates are highly correlated, e.g tc and ldl. This results in imprecise estimation of the regression parameters, as the variance is high in this situation.
+Looking at the scatter-plot between all the covariates in figure 2, it is clear that some of the covariates are highly correlated, e.g tc and ldl. This results in imprecise estimation of the regression parameters, as the variance is high in this situation. It also means that we have to be careful when removing insignificant variables, as we might eliminate important variables from the model.
 
 To look into the significance of the regression one can use the F-test: 
 $$
-H_0: \beta_j = 0 \;\;\forall j = 0, \dots ,p \quad H_1: \text{at least one} \; \beta_j \ne 0
+H_0: \beta_j = 0 \;\;\forall j = 0, \dots ,p \quad H_1: \text{at least one} \; \beta_j \ne 0.
 $$
 For this model the F-test yields a low p-value, and the null-hypothesis is rejected. Thus, the regression is significant.
 
@@ -99,8 +90,7 @@ The $\textbf{Multiple R-squared}$ in figure 1 is the coefficient of determinatio
 \begin{equation}
 R^2=\frac{\sum_{i=1}^n (\hat{y_i}-\bar{y})^2}{\sum_{i=1}^n ({y_i}-\bar{y})^2}=1-\frac{\hat{\varepsilon}_i^2}{\sum_{i=1}^n ({y_i}-\bar{y})^2},
 \end{equation}
-which is a measurement of the amount of variance that is explained by the model. We observe that the closer $R^2$ is to 1, the smaller the residual
-sum of squares $\varepsilon_i^2$ are, and thus the better the fit to the data. 
+which is a measurement of the amount of variance that is explained by the model. We observe that the closer $R^2$ is to 1, the smaller the residual sum of squares $\varepsilon_i^2$ are, and thus the better the fit to the data. 
 
 In terms of proportion of variance explained by this model, the fit is pretty poor. Both $R^2$ and adjusted $R^2$ yields a pretty low value of roughly 51% explained variance.
 
@@ -117,15 +107,15 @@ which.min(allsummary$bic)
 plot(allsummary$bic,xlab = 'variables',ylab = 'BIC',type = 'l')
 plot(allsubs,scale = 'bic')
 ```
-The more covariates included in a model, the more complex the model is, and the model becomes less biased. Thus, by the bias-variance tradeoff, the more complex a model is, the higher the variance of the resulting model. When doing predictions, one obtains a more accurate prediction if the variance is low. Hence, a reduced model results in lower variance, and might perform better when doing predictions. 
+The more covariates included in a model, the more complex the model is, and the model becomes less biased. Thus, by the bias-variance tradeoff, the more complex a model is, the higher the variance of the resulting model. When doing predictions, one obtains a more accurate prediction if the variance is low. Hence, a reduced model results in lower variance, and might perform better when doing predictions, if removing covariates does not increase the bias too much.
 
-As for the best subset model selection method, one fit for every covariate $k = 0,...,p$, all the $p\choose k$ models containing k covariates, and pick the best model (which contains an equal amount of covariates) in terms of the $R^2$-metric. Once the methods has found the best $p$ models each containing a different amount of covariates, the method choose the ultimately best model in terms of some model choice criteria, e.g BIC or $R^2_{\text{adj}}$.
+As for the best subset model selection method, first all the $p\choose k$ models containing k covariates are compared in terms of the $R^2$-metric, this is repeated for every number of covariates $k = 0,...,p$. Once the methods has found the best $p$ models each containing a different amount of covariates, the method choose the ultimately best model in terms of some model choice criteria, e.g BIC or $R^2_{\text{adj}}$.
 
 BIC is an abbreviation of Bayesian Information Criterion, and is defined as 
 $$
-\text{BIC} = \frac{RSS/n}{\hat{\sigma}^2} + \log{n}\frac{p}{n} = \frac{\sum_{i = 1}^n(y_i - \hat{y_i})^2/n}{\hat{\sigma}^2} + \log{n}\frac{p}{n}
+\text{BIC} = \frac{RSS/n}{\hat{\sigma}^2} + \log{(n)}\frac{p}{n} = \frac{\sum_{i = 1}^n(y_i - \hat{y_i})^2/n}{\hat{\sigma}^2} + \log{(n)}\frac{p}{n}
 $$
-The model with the lowest BIC is the preferred model.
+The model with the lowest BIC is the preferred model. As one observes, this criteria wants to minimize the squared error and penalizes more complex models, i.e. if a model add new free covariates that does not reduce the RSS the BIC will increase. 
 
 $R^2_{\text{adj}}$ is a measure of proportion of variability explained by a model, where the number of covaraites included in the model is taken into account. $R^2_{\text{adj}}$ is defined as
 
@@ -135,16 +125,9 @@ $$
 Note that $R^2_{\text{adj}}$ includes a penalty on the number of included covariates $p$ in the model, and that $p = 1$ corresponds the the multiple $R^2$.
 The model with highest $R^2_{\text{adj}}$ is the preferred model.
 
-The 10 different models was calculated using the regsubsets-command in R, which use the "leaps and bounds" algorithm. The algorithms return the optimal model, and thereby avoid the computation of all $2^p$ models, where $p$ is the number of covariates in the full model. 
+The 10 different models was calculated using the regsubsets-command in R, which use the "leaps and bounds" algorithm. The algorithms return the optimal model for each number of covariates, and thereby avoid the computation of all $2^p$ models, where $p$ is the number of covariates in the full model.
 
-Based on BIC, the best reduced model contains 5 covariates, while the best reduced model based on $R^2_{\text{adj}}$ contains 8. The best model for each model selection criteria is found in the best subset selection matrix above. THe resulting model fits are shown in the code-chunk below. 
-
-One observes that all covariates are significant in the less complex model, i.e the model chosen by the BIC criteria. The model chosen by the $R^2_{\text{adj}}$ criterion contains unsignificant variables as well. To choose the best of these two models we also look at how BIC and $R^2_{\text{adj}}$ behaves with varying included covariates. If one look at the plot of $R^2_{\text{adj}}$ one observes that the $R^2_{\text{adj}}$ is pretty much stable in the interval 5-10 covariates. However, in the BIC-plot, one observes a low at 5 covariates followed by a clear increase up to the full model. Therefore 5 covariates is closest to optimal when considering both criterions.
-
-Based on this, we chose to go forward with the model selected by the BIC criterion, i.e the model with 5 covariates. This model will from now on be referred to as the reduced model.The reduced fitted regression model is given by,
-$$
-\widehat{\text{Prog}} = -240.0 - 22.4\text{Sex} + 5.6\text{Bmi} + 1.1\text{Map} -1.1\text{Hdl} + 99.5\text{Ltg} 
-$$
+Based on BIC, the best reduced model contains 5 covariates, while the best reduced model based on $R^2_{\text{adj}}$ contains 8. The best model for each model selection criteria is found in the best subset selection matrix above. The resulting model fits are shown in the code-chunk below. 
 
 ```{r,eval = TRUE,echo = TRUE}
 bic.fit = lm(prog~sex+bmi+map+hdl+ltg,data = ds)
@@ -153,36 +136,45 @@ summary(bic.fit)
 r2adj.fit = lm(prog~sex+bmi+map+tc+ldl+tch+ltg+glu,data = ds)
 summary(r2adj.fit)
 ```
-```{r,eval = TRUE}
-model.full = summary(full)
-model.full
-```
+One observes that all covariates are significant in the less complex model, i.e the model chosen by the BIC criteria. The model chosen by the $R^2_{\text{adj}}$ criterion contains unsignificant variables as well. To choose the best of these two models we also look at how BIC and $R^2_{\text{adj}}$ behaves with varying included covariates. If one look at the plot of $R^2_{\text{adj}}$ one observes that the $R^2_{\text{adj}}$ is pretty much stable in the interval 5-10 covariates. However, in the BIC-plot, one observes a low at 5 covariates followed by a clear increase up to the full model. Therefore 5 covariates is closest to optimal when considering both criterions.
+
+Based on this, we chose to go forward with the model selected by the BIC criterion, i.e the model with 5 covariates. This model will from now on be referred to as the reduced model.The reduced fitted regression model is given by,
+$$
+\widehat{\text{Prog}} = -240.0 - 22.4\text{Sex} + 5.6\text{Bmi} + 1.1\text{Map} -1.1\text{Hdl} + 99.5\text{Ltg} 
+$$
+
 As mentioned above, all included covariates in the reduced model are significant. The full model, however, contains unsignificant covariates. Including these irrelevant variables causes the precision of the estimators to decrease due to overfitting. The overall standard error is less in the reduced model than the full, meaning that the prediction from the reduced model is more accurate.
 
 
 **d)**
 
 ```{r,eval = TRUE}
-p_age = model.full$coefficients['age','Pr(>|t|)']
-p_tc =  model.full$coefficients['tc','Pr(>|t|)']
-p_ldl =  model.full$coefficients['ldl','Pr(>|t|)']
-p_tch =  model.full$coefficients['tch','Pr(>|t|)']
-p_glu =  model.full$coefficients['glu','Pr(>|t|)']
-p_tot = p_age*p_tc*p_ldl*p_tch*p_glu
-p_tot
+fullmodel = lm(prog ~ ., data=ds)
+restricted = lm(prog ~ bmi + ltg + map + hdl + sex, data=ds)
 
-#model.test = lm(prog~age+tc+ldl+tch+glu,data = ds)
-#print(anova(full,model.test))
+#Method 1
+c<-matrix(c(0,1,0,0,0,0,0,0,0,0,0,
+            0,0,0,0,0,1,0,0,0,0,0,
+            0,0,0,0,0,0,1,0,0,0,0,
+            0,0,0,0,0,0,0,0,1,0,0,
+            0,0,0,0,0,0,0,0,0,0,1),byrow=TRUE,nrow=5)
+r<-5 # rank of c
+p<-11
+n<-442
+f<-t(c%*%fullmodel$coefficients)%*%solve(c%*%solve(t(model.matrix(fullmodel))%*%model.matrix(fullmodel))%*%t(c))%*%c%*%fullmodel$coefficients/r/summary(fullmodel)$sigma^2
+pf(f,r,n-p,lower.tail=FALSE)
+
 ```
 As one can observe the $p$-value of the hyphothesis test
 \begin{equation}
      H_0: \beta_{age}=\beta_{tc}=\beta_{ldl}=\beta_{tch}=\beta_{glu}=0, \qquad H_1: \text{at least one} \neq 0.
 \end{equation}
-is equal to 0.007. Thus there is a low probability that all these estimated regression parameters are equal to zero and the null-hypothesis is rejected. However, as seen in exercise c) the BIC of the reduced model is better than for the full model. The rejection of the null hypothesis simply indicates that the reduced model will have a larger bias than the full model. The BIC however, consider the tradeoff between increased variance and decreased bias when increasing the number of covariates. Thus we would prefer the reduced model, as it yields a more optimal bias-variance tradeoff according to the BIC-values. 
+is equal to 0.1523. Thus with a significance level of 0.05 the null-hypothesis is accepted. As seen in exercise c) the BIC of the reduced model is lower than for the full model. The accepted null hypothesis supports this proposition by indicating that all regression coefficients considered in this assignment are equal to zero. The BIC consider the tradeoff between increased variance and decreased bias when increasing the number of covariates. Thus we would prefer the reduced model, as it yields a more optimal bias-variance tradeoff according to the BIC-values and the hypothesis test. 
 
 # Problem 2
 
 **a)**
+Assume we reject all null-hypotheses with p-values less than a significance level of 0.05. From our dataset of p-values, how many null-hypothesis are rejected at this signifance level?
 ```{r,eval = TRUE}
 pvalues <-scan("https://www.math.ntnu.no/emner/TMA4267/2018v/pvalues.txt")
 
@@ -201,67 +193,46 @@ With a significance level of 0.05, we say that the probability of making a type 
 
 We can not say how many of these rejected null-hypothesis that were actually true, as our data only consists of the p-values. 
 However, we could try to estimate it using the number of rejected null-hypothesis and the significance level, yielding $155\cdot0.05 =$ `r rejected*alpha` type 1 errors on average.
+To verify this number we would need actual information of which hypotheses are true.
 
 **b) **
 The Familywise Error Rate (FWER) is the probability of making at least one type 1 error in a series of hypothesis tests. The term family comes from the family of tests, which is the technical term for a series of tests on data.
 
 To control the FWER at level 0.05, one would adjust the threshold for where the rejection of the null-hypothesis is made such that the probability of making at least one type 1 error is stable on 0.05.
 
-The cutoff for p-values when using the Bonferroni method should be set to 0.05 divided by the number of null-hypothesis, so in our case this number would yield $0.05/1000 = 5*10^{-5}$.
+The cutoff for p-values when using the Bonferroni method should be set to 0.05 divided by the number of null-hypothesis, so in our case this number would yield $0.05/1000 = 5\cdot10^{-5}$.
 
 ```{r,eval = TRUE}
 pvalues <-scan("https://www.math.ntnu.no/emner/TMA4267/2018v/pvalues.txt")
-
+library(rlist)
 alpha = 0.05/1000
-rejected = 0
-for (i in pvalues){
-  if (i < alpha){
-    rejected = rejected +1
-  } 
-}
+rejected<-list.count(pvalues,x~x<alpha)
 rejected
 ```
 For our p-values, the number of rejections with the Bonferroni method is 50.
 
 **c)**
 
-Assuming that the first 900 null-hypotheses true, and last 100 false. We first investigate the number of type 1 and type 2 errors
+Assuming that the first 900 null-hypotheses true, and last 100 false. We now have a way to verify the number of type 1 and type 2 errors.
 ```{r,eval = TRUE}
-
-errors<-function(alpha){
-  typ1 = 0
-  typ2 = 0
-  for (i in seq(from = 1, to = length(pvalues))){
-    if (i <= 900){
-      if (pvalues[i] < alpha){
-        typ1 = typ1 +1
-      }
-    }
-  
-    else{
-      if (pvalues[i] >= alpha){
-        typ2 = typ2 +1
-      }
-    }
-  }
-  return (c(typ1,typ2))
-}
-
 alpha_a = 0.05
 alpha_b = 0.05/length(pvalues)
 
-error_a = errors(alpha_a)
-error_b = errors(alpha_b)
+error1a <- list.count(pvalues[1:900], x ~ x < alpha_a)
+error1b <- list.count(pvalues[1:900], x ~ x < alpha_b)
+
+error2a <- list.count(pvalues[901:1000], x ~ x >= alpha_a)
+error2b <- list.count(pvalues[901:1000], x ~ x >= alpha_b)
 print("Type 1 error a):")
-print(error_a[1])
+print(error1a)
 print("Type 2 error a):")
-print(error_a[2])
+print(error2a)
 
 print("Type 1 error b):")
-print(error_b[1])
+print(error1b)
 print("Type 2 error b):")
-print(error_b[2])
+print(error2b)
 ```
 With $\alpha = 0.05$ as in problem a), we observe 55 type 1 errors and 0 type 2 errors. Which indicates that we could probably lower the significance level in this situation. However, it depends on how important it is to avoid type 2 errors compared to avoiding type 1 errors.
 
-With $\alpha = 5\cdot 10^{-5}$ as in problem b), we observe 0 type 1 errors and 50 type 2 errors. Which indicates that we could probably increase the significance level in this situation. However, it depends on how important it is to avoid type 1 errors compared to avoiding type 2 errors.
+With $\alpha = 5\cdot 10^{-5}$ as in problem b), we observe 0 type 1 errors and 50 type 2 errors. From controlling of the FWER the probability of making even 1 type 1 error is very low and so it is expected that the set now yields zero such errors. However, the significance level is now set very low and we observe an increase in type 2 errors. This could imply that the controlling is a bit too strict. The bonferroni method is indeed critisized for making the probability of type 2 errors too high and so perhaps another control method e.g. sidak would yield better results when considering both type 1 and type 2 errors.

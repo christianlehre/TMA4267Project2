@@ -85,7 +85,7 @@ For the p-value to be valid, the assumption of independently and identically nor
 
 The Anderson-Darling normality test yields a high p-value, and thus the hypothesis that the residuals are normally distributed is accepted. 
 However, one observes from figure 2 that the studentized residuals are heteroscedatic, and thus the errors are heteroscedatic. This is problematic, as the linear model assumes homoscedatic errors.
-There is no clear evidence of any non-linear effects of the covariates looking at the studentized residuals.However, there seems to be a tendency of the residuals lying above zeros in the left of the plot and then more below zero as we move to the right, which could be a sign of autocorrelated errors.
+There is no clear evidence of any non-linear effects of the covariates looking at the studentized residuals.However, to investigate this further we made a plot of the conditional mean  there seems to be a tendency of the residuals lying above zeros in the left of the plot and then more below zero as we move to the right, which could be a sign of autocorrelated errors.
 
 Looking at the scatter-plot between all the covariated in figure 2, it is clear that some of the covariates are highly correlated, e.g tc and ldl. This results in imprecise estimation of the regression parameters, as the variance is high in this situation.
 

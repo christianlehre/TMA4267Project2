@@ -198,7 +198,7 @@ We can not say how many of these rejected null-hypothesis that were actually tru
 However, we could try to estimate it using the number of rejected null-hypothesis and the significance level, yielding $155\cdot0.05 =$ `r rejected*alpha` type 1 errors on average.
 
 **b) **
-The Familiwise Error Rate (FWER) is the probability of making at least one type 1 error in a series of hypothesis tests. The term family comes from the family of tests, which is the technical term for a series of tests on data.
+The Familywise Error Rate (FWER) is the probability of making at least one type 1 error in a series of hypothesis tests. The term family comes from the family of tests, which is the technical term for a series of tests on data.
 
 To control the FWER at level 0.05, one would adjust the threshold for where the rejection of the null-hypothesis is made such that the probability of making at least one type 1 error is stable on 0.05.
 
@@ -220,7 +220,7 @@ For our p-values, the number of rejections with the Bonferroni method is 50.
 
 **c)**
 
-Assuming that the first 900 null-hypotheses true, and last 100 false. We first investigate the number of type 1 and type 2 errors with $\alpha = 0.05$ as in problem a)
+Assuming that the first 900 null-hypotheses true, and last 100 false. We first investigate the number of type 1 and type 2 errors
 ```{r,eval = TRUE}
 
 errors<-function(alpha){
@@ -259,7 +259,4 @@ print(error_b[2])
 ```
 With $\alpha = 0.05$ as in problem a), we observe 55 type 1 errors and 0 type 2 errors. Which indicates that we could probably lower the significance level in this situation. However, it depends on how important it is to avoid type 2 errors compared to avoiding type 1 errors.
 
-For $\alpha = 5\cdot 10^{-5}$ as in problem b) the same code yields,
-
 With $\alpha = 5\cdot 10^{-5}$ as in problem b), we observe 0 type 1 errors and 50 type 2 errors. Which indicates that we could probably increase the significance level in this situation. However, it depends on how important it is to avoid type 1 errors compared to avoiding type 2 errors.
->>>>>>> bb17ffa89f1b9468bffdd2f6e27562c8e59002ac

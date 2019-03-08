@@ -160,8 +160,12 @@ r<-5 # rank of c
 p<-11
 n<-442
 f<-t(c%*%fullmodel$coefficients)%*%solve(c%*%solve(t(model.matrix(fullmodel))%*%model.matrix(fullmodel))%*%t(c))%*%c%*%fullmodel$coefficients/r/summary(fullmodel)$sigma^2
-pf(f,r,n-p,lower.tail=FALSE)
+print('Manual method:')
+pf(f,r,n-p,lower.tail=FALSE)[1]
 
+
+print('Built-in method:')
+print(anova(fullmodel,restricted)$`Pr(>F)`[2])
 ```
 As one can observe the $p$-value of the hyphothesis test
 \begin{equation}

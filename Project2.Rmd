@@ -34,13 +34,13 @@ $$\widehat{\text{SD}}(\hat{\beta_j}) = \sqrt{\hat{\sigma}^2(X^TX)^{-1}_{jj}},$$ 
 * `t value`
 \newline
 Value of the t-statistic for testing whether the corresponding regression coefficient is different from 0. The t-value is given by 
-$$t = \frac{\hat{\beta_j}-\beta_j}{\widehat{\text{SD}(\hat{\beta_j})}}=\frac{\hat{\beta_j}}{\widehat{\text{SD}(\hat{\beta_j})}},$$ where $\beta_j$ is the regression coefficient for covariate $x_j$, $\hat{\beta_j}$ the estimated regression coefficient and $\widehat{\text{SD}(\hat{\beta_j})}$ the Std.Error as explained above.
+$$t = \frac{\hat{\beta_j}-\beta_j}{\widehat{\text{SD}}(\hat{\beta_j})}=\frac{\hat{\beta_j}}{\widehat{\text{SD}}(\hat{\beta_j})},$$ where $\beta_j$ is the regression coefficient for covariate $x_j$, $\hat{\beta_j}$ the estimated regression coefficient and $\widehat{\text{SD}}(\hat{\beta_j})$ the Std.Error as explained above. The last equation follows from the fact that we calculate the t-statistic under the null-hypothesis.
 
 * `P(>|t|)`
 \newline
 Probability of observing a more extreme value than $t$ under the null hypothesis, i.e the so-called p-value used in hypothesis testing. The p-value is given by
 $$
-2P(T > |t| : H_0),
+2P(T \ge |t| : H_0),
 $$
 where $H_0$ is the null-hypothesis, $T \sim t_{n-p}$ is a random variable and $t$ is the observed value calculated from the formula above. The factor 2 results from the test being two-sided.
 
@@ -69,7 +69,8 @@ For the p-value to be valid, the assumption of independently and identically nor
 
 **b) Model Evaluation**
 
-The Anderson-Darling normality test yields a high p-value, and thus the hypothesis that the residuals are normally distributed is accepted.By observing the Q-Q plot as well this seems to be a reasonable hypothesis for the model, even though it is a bit heavy-tailed.  However, one observes from figure 2 that the studentized residuals are heteroscedatic, which contradicts the model assumptions of homoscedatic error.
+The Anderson-Darling normality test yields a high p-value, and thus the hypothesis that the residuals are normally distributed is accepted. By observing the Q-Q plot this seems to be a reasonable hypothesis as the sample quantiles almost follows the diagonal line implying equality with the theoretical quantiles for the normal distribution.
+However, one observes from the residual plot in figure 2 that the studentized residuals are heteroscedatic, which contradicts the model assumptions of homoscedatic error.
 There is also some evidence of non-linear effects of the covariates looking at the studentized residuals, especially at the tails. To investigate this further, we made a plot of the conditional mean, which is marked as a red curve in the residual plot. 
 ```{r,eval = TRUE}
 library(ggplot2)
@@ -92,7 +93,7 @@ R^2=\frac{\sum_{i=1}^n (\hat{y_i}-\bar{y})^2}{\sum_{i=1}^n ({y_i}-\bar{y})^2}=1-
 \end{equation}
 which is a measurement of the amount of variance that is explained by the model. We observe that the closer $R^2$ is to 1, the smaller the residual sum of squares $\varepsilon_i^2$ are, and thus the better the fit to the data. 
 
-In terms of proportion of variance explained by this model, the fit is pretty poor. Both $R^2$ and adjusted $R^2$ yields a pretty low value of roughly 51% explained variance.
+In terms of proportion of variance explained by this model, both $R^2$ and adjusted $R^2$ yields a value of roughly 51% explained variance. This indicates that there are quite a lot unexplained variance not covered by the model, which is expected as the progression of a disease depends on a lot of factors and is difficult to describe by a mathematical model.
 
 **c)**
 ```{r,eval = FALSE,echo = FALSE}
@@ -109,7 +110,9 @@ plot(allsubs,scale = 'bic')
 ```
 The more covariates included in a model, the more complex the model is, and the model becomes less biased. Thus, by the bias-variance tradeoff, the more complex a model is, the higher the variance of the resulting model. When doing predictions, one obtains a more accurate prediction if the variance is low. Hence, a reduced model results in lower variance, and might perform better when doing predictions, if removing covariates does not increase the bias too much.
 
-As for the best subset model selection method, first all the $p\choose k$ models containing k covariates are compared in terms of the $R^2$-metric. This is repeated for every number of covariates $k = 0,...,p$. Once the methods has found the best $p$ models each containing a different amount of covariates, the method choose the ultimately best model in terms of some model choice criteria, e.g. BIC or $R^2_{\text{adj}}$. The 10 optimal models for our data, in figure 4, was calculated using the regsubsets-command in R, which use the "leaps and bounds" algorithm.The algorithms avoid the computation of all $2^p$ models by use of search trees. 
+As for the best subset model selection method, first all the $p\choose k$ models containing k covariates are compared in terms of the $R^2$-metric. This is repeated for every number of covariates $k = 0,...,p$. Once the methods has found the best $p$ models each containing a different amount of covariates, the method choose the ultimately best model in terms of some model choice criteria, e.g. BIC or $R^2_{\text{adj}}$. These two methods penalize the number of covariates and can therefore be used to compare models with different number of covariates. 
+
+The 10($p$) optimal models for our data, in figure 4, was calculated using the regsubsets-command in R, which use the "leaps and bounds" algorithm for finding the 10 best models with varying covariates.
 
 BIC is an abbreviation of Bayesian Information Criterion, and is defined as 
 $$
@@ -125,7 +128,7 @@ $$
 Note that $R^2_{\text{adj}}$ includes a penalty on the number of included covariates $p$ in the model, and that $p = 1$ corresponds to the multiple $R^2$.
 The model with highest $R^2_{\text{adj}}$ is the preferred model.
 
-Based on BIC, the best reduced model contains 5 covariates, while the best reduced model based on $R^2_{\text{adj}}$ contains 8. The resulting model fits are shown in the code-chunk below. 
+By looking at the right panel of figure 4, one observes that based on BIC, the best reduced model contains 5 covariates, while the best reduced model based on $R^2_{\text{adj}}$ contains 8. The resulting model fits are shown in the code-chunk below. 
 
 ```{r,eval = TRUE,echo = TRUE}
 bic.fit = lm(prog~sex+bmi+map+hdl+ltg,data = ds)
@@ -134,7 +137,7 @@ summary(bic.fit)
 r2adj.fit = lm(prog~sex+bmi+map+tc+ldl+tch+ltg+glu,data = ds)
 summary(r2adj.fit)
 ```
-One observes that all covariates are significant in the less complex model, i.e the model chosen by the BIC criteria. The model chosen by the $R^2_{\text{adj}}$ criterion contains unsignificant variables as well. To choose the best of these two models we also look at how BIC and $R^2_{\text{adj}}$ behaves with varying included covariates. If one looks at the plot of $R^2_{\text{adj}}$ one observes that the $R^2_{\text{adj}}$ is pretty much stable in the interval 5-10 covariates. However, in the BIC-plot, one observes a low at 5 covariates followed by a clear increase up to the full model. Therefore 5 covariates is closest to optimal when considering both criterions.
+One observes that all covariates are significant in the less complex model, i.e the model chosen by the BIC criteria. The model chosen by the $R^2_{\text{adj}}$ criterion contains unsignificant variables as well. To choose the best of these two models we also look at how BIC and $R^2_{\text{adj}}$ behaves with varying included covariates in the left panel of figure 4. If one looks at the plot of $R^2_{\text{adj}}$ one observes that the $R^2_{\text{adj}}$ is pretty much stable in the interval 5-10 covariates. However, in the BIC-plot, one observes a low at 5 covariates followed by a clear increase up to the full model. Therefore 5 covariates is closest to optimal when considering both criterions.
 
 Based on this, we chose to go forward with the model selected by the BIC criterion, i.e the model with 5 covariates. This model will from now on be referred to as the reduced model.The reduced fitted regression model is given by,
 $$
@@ -171,7 +174,7 @@ As one can observe the $p$-value of the hyphothesis test
 \begin{equation}
      H_0: \beta_{age}=\beta_{tc}=\beta_{ldl}=\beta_{tch}=\beta_{glu}=0, \qquad H_1: \text{at least one} \neq 0.
 \end{equation}
-is equal to 0.1523. Thus with a significance level of 0.05 the null-hypothesis is accepted. As seen in exercise c) the BIC of the reduced model is lower than for the full model. The accepted null hypothesis supports this proposition by indicating that all regression coefficients considered in this assignment are equal to zero and thus the covariates are irrelevant. The BIC consider the tradeoff between increased variance and decreased bias when increasing the number of covariates. Thus we would prefer the reduced model, as it yields a more optimal bias-variance tradeoff according to the BIC-values and the hypothesis test. 
+is equal to 0.1523. Thus with a significance level of 0.05 the null-hypothesis is accepted. As seen in exercise c) the BIC of the reduced model is lower than for the full model. The accepted null hypothesis supports this proposition by indicating that all regression coefficients considered in this problem are equal to zero and thus the covariates are irrelevant. The BIC consider the tradeoff between increased variance and decreased bias when increasing the number of covariates. Thus we would prefer the reduced model, as it yields a more optimal bias-variance tradeoff according to the BIC-values and the hypothesis test. 
 
 # Problem 2
 

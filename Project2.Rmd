@@ -69,7 +69,7 @@ For the p-value to be valid, the assumption of independently and identically nor
 
 **b) Model Evaluation**
 
-The Anderson-Darling normality test yields a high p-value, and thus the hypothesis that the residuals are normally distributed is accepted.By observing the Q-Q plot as well this seems to be a reasonable hypothesis for the model.  However, one observes from figure 2 that the studentized residuals are heteroscedatic, which contradicts the model assumptions of homoscedatic error.
+The Anderson-Darling normality test yields a high p-value, and thus the hypothesis that the residuals are normally distributed is accepted.By observing the Q-Q plot as well this seems to be a reasonable hypothesis for the model, even though it is a bit heavy-tailed.  However, one observes from figure 2 that the studentized residuals are heteroscedatic, which contradicts the model assumptions of homoscedatic error.
 There is also some evidence of non-linear effects of the covariates looking at the studentized residuals, especially at the tails. To investigate this further, we made a plot of the conditional mean, which is marked as a red curve in the residual plot. 
 ```{r,eval = TRUE}
 library(ggplot2)
@@ -78,7 +78,7 @@ ggplot(full,aes(full$fitted,rstudent(full))) + geom_point(pch= 21) + geom_hline(
 ```
 The conditional mean supports our assumption of non-linearity. This might imply autocorrelation of the errors, which disagrees with the model assumption of uncorrelated errors. However, the trend is not very clear.
 
-Looking at the scatter-plot between all the covariates in figure 2, it is clear that some of the covariates are highly correlated, e.g tc and ldl. This results in imprecise estimation of the regression parameters, as the variance is high in this situation. It also means that we have to be careful when removing insignificant variables, as we might eliminate important variables from the model.
+Looking at the scatter-plot between all the covariates in figure 2, it is clear that some of the covariates are highly correlated, e.g. tc and ldl. This results in imprecise estimation of the regression parameters, as the variance is high in this situation. It also means that we have to be careful when removing insignificant variables, as we might eliminate important variables from the model.
 
 To look into the significance of the regression one can use the F-test: 
 $$
@@ -109,7 +109,7 @@ plot(allsubs,scale = 'bic')
 ```
 The more covariates included in a model, the more complex the model is, and the model becomes less biased. Thus, by the bias-variance tradeoff, the more complex a model is, the higher the variance of the resulting model. When doing predictions, one obtains a more accurate prediction if the variance is low. Hence, a reduced model results in lower variance, and might perform better when doing predictions, if removing covariates does not increase the bias too much.
 
-As for the best subset model selection method, first all the $p\choose k$ models containing k covariates are compared in terms of the $R^2$-metric, this is repeated for every number of covariates $k = 0,...,p$. Once the methods has found the best $p$ models each containing a different amount of covariates, the method choose the ultimately best model in terms of some model choice criteria, e.g BIC or $R^2_{\text{adj}}$.
+As for the best subset model selection method, first all the $p\choose k$ models containing k covariates are compared in terms of the $R^2$-metric. This is repeated for every number of covariates $k = 0,...,p$. Once the methods has found the best $p$ models each containing a different amount of covariates, the method choose the ultimately best model in terms of some model choice criteria, e.g. BIC or $R^2_{\text{adj}}$. The 10 optimal models for our data, in figure 4, was calculated using the regsubsets-command in R, which use the "leaps and bounds" algorithm.The algorithms avoid the computation of all $2^p$ models by use of search trees. 
 
 BIC is an abbreviation of Bayesian Information Criterion, and is defined as 
 $$
@@ -117,17 +117,15 @@ $$
 $$
 The model with the lowest BIC is the preferred model. As one observes, this criteria wants to minimize the squared error and penalizes more complex models, i.e. if a model add new free covariates that does not reduce the RSS the BIC will increase. 
 
-$R^2_{\text{adj}}$ is a measure of proportion of variability explained by a model, where the number of covaraites included in the model is taken into account. $R^2_{\text{adj}}$ is defined as
+$R^2_{\text{adj}}$ is a measure of proportion of variability explained by a model, where the number of covariates included in the model is taken into account. $R^2_{\text{adj}}$ is defined as
 
 $$
 R^2_{\text{adj}} = 1 - \frac{RSS/(n-p)}{TSS/(n-1)} = 1  -\frac{\sum_{i = 1}^n(y_i-\hat{y_i})^2/(n-p)}{\sum_{j = 1}^n(y_i-\bar{y})^2/(n-1)}
 $$
-Note that $R^2_{\text{adj}}$ includes a penalty on the number of included covariates $p$ in the model, and that $p = 1$ corresponds the the multiple $R^2$.
+Note that $R^2_{\text{adj}}$ includes a penalty on the number of included covariates $p$ in the model, and that $p = 1$ corresponds to the multiple $R^2$.
 The model with highest $R^2_{\text{adj}}$ is the preferred model.
 
-The 10 different models was calculated using the regsubsets-command in R, which use the "leaps and bounds" algorithm. The algorithms return the optimal model for each number of covariates, and thereby avoid the computation of all $2^p$ models, where $p$ is the number of covariates in the full model.
-
-Based on BIC, the best reduced model contains 5 covariates, while the best reduced model based on $R^2_{\text{adj}}$ contains 8. The best model for each model selection criteria is found in the best subset selection matrix above. The resulting model fits are shown in the code-chunk below. 
+Based on BIC, the best reduced model contains 5 covariates, while the best reduced model based on $R^2_{\text{adj}}$ contains 8. The resulting model fits are shown in the code-chunk below. 
 
 ```{r,eval = TRUE,echo = TRUE}
 bic.fit = lm(prog~sex+bmi+map+hdl+ltg,data = ds)
@@ -136,7 +134,7 @@ summary(bic.fit)
 r2adj.fit = lm(prog~sex+bmi+map+tc+ldl+tch+ltg+glu,data = ds)
 summary(r2adj.fit)
 ```
-One observes that all covariates are significant in the less complex model, i.e the model chosen by the BIC criteria. The model chosen by the $R^2_{\text{adj}}$ criterion contains unsignificant variables as well. To choose the best of these two models we also look at how BIC and $R^2_{\text{adj}}$ behaves with varying included covariates. If one look at the plot of $R^2_{\text{adj}}$ one observes that the $R^2_{\text{adj}}$ is pretty much stable in the interval 5-10 covariates. However, in the BIC-plot, one observes a low at 5 covariates followed by a clear increase up to the full model. Therefore 5 covariates is closest to optimal when considering both criterions.
+One observes that all covariates are significant in the less complex model, i.e the model chosen by the BIC criteria. The model chosen by the $R^2_{\text{adj}}$ criterion contains unsignificant variables as well. To choose the best of these two models we also look at how BIC and $R^2_{\text{adj}}$ behaves with varying included covariates. If one looks at the plot of $R^2_{\text{adj}}$ one observes that the $R^2_{\text{adj}}$ is pretty much stable in the interval 5-10 covariates. However, in the BIC-plot, one observes a low at 5 covariates followed by a clear increase up to the full model. Therefore 5 covariates is closest to optimal when considering both criterions.
 
 Based on this, we chose to go forward with the model selected by the BIC criterion, i.e the model with 5 covariates. This model will from now on be referred to as the reduced model.The reduced fitted regression model is given by,
 $$
@@ -169,31 +167,24 @@ As one can observe the $p$-value of the hyphothesis test
 \begin{equation}
      H_0: \beta_{age}=\beta_{tc}=\beta_{ldl}=\beta_{tch}=\beta_{glu}=0, \qquad H_1: \text{at least one} \neq 0.
 \end{equation}
-is equal to 0.1523. Thus with a significance level of 0.05 the null-hypothesis is accepted. As seen in exercise c) the BIC of the reduced model is lower than for the full model. The accepted null hypothesis supports this proposition by indicating that all regression coefficients considered in this assignment are equal to zero. The BIC consider the tradeoff between increased variance and decreased bias when increasing the number of covariates. Thus we would prefer the reduced model, as it yields a more optimal bias-variance tradeoff according to the BIC-values and the hypothesis test. 
+is equal to 0.1523. Thus with a significance level of 0.05 the null-hypothesis is accepted. As seen in exercise c) the BIC of the reduced model is lower than for the full model. The accepted null hypothesis supports this proposition by indicating that all regression coefficients considered in this assignment are equal to zero and thus the covariates are irrelevant. The BIC consider the tradeoff between increased variance and decreased bias when increasing the number of covariates. Thus we would prefer the reduced model, as it yields a more optimal bias-variance tradeoff according to the BIC-values and the hypothesis test. 
 
 # Problem 2
 
 **a)**
 Assume we reject all null-hypotheses with p-values less than a significance level of 0.05. From our dataset of p-values, how many null-hypothesis are rejected at this signifance level?
 ```{r,eval = TRUE}
+library(rlist)
 pvalues <-scan("https://www.math.ntnu.no/emner/TMA4267/2018v/pvalues.txt")
-
 alpha = 0.05
-rejected = 0
-for (i in pvalues){
-  if (i < alpha){
-    rejected = rejected +1
-  } 
-}
+rejected<-list.count(pvalues,x~x<alpha)
 rejected
 ```
 Based on our data, and a significance level of 0.05, we reject 155 of 1000 null-hypotheses.
-A false positive finding, i.e a type 1 error, is the case when one reject a true $H_0$
+A false positive finding, i.e a type 1 error, is the case when one reject a true $H_0$.
 With a significance level of 0.05, we say that the probability of making a type 1 error is 0.05. 
 
-We can not say how many of these rejected null-hypothesis that were actually true, as our data only consists of the p-values. 
-However, we could try to estimate it using the number of rejected null-hypothesis and the significance level, yielding $155\cdot0.05 =$ `r rejected*alpha` type 1 errors on average.
-To verify this number we would need actual information of which hypotheses are true.
+We can not say how many of these rejected null-hypothesis that were actually true, as our data only consists of the p-values.
 
 **b) **
 The Familywise Error Rate (FWER) is the probability of making at least one type 1 error in a series of hypothesis tests. The term family comes from the family of tests, which is the technical term for a series of tests on data.
@@ -204,7 +195,6 @@ The cutoff for p-values when using the Bonferroni method should be set to 0.05 d
 
 ```{r,eval = TRUE}
 pvalues <-scan("https://www.math.ntnu.no/emner/TMA4267/2018v/pvalues.txt")
-library(rlist)
 alpha = 0.05/1000
 rejected<-list.count(pvalues,x~x<alpha)
 rejected
